@@ -161,7 +161,7 @@ const server = createServer(async (req, res) => {
       if (process.env.ARENA_LOG !== '0') {
         const what = out.ok ? `choice ${out.choice}` : out.error;
         const cost = out.costUsd ? ` · $${out.costUsd.toFixed(6)}` : '';
-        console.log(`${new Date().toISOString().slice(11, 23)}  ${c.cid.padEnd(16)} ${String(Math.round(out.latencyMs)).padStart(5)} ms  ${what}${out.tokens ? ` · ${out.tokens} tok` : ''}${cost}${out.drift ? ' · DRIFT' : ''}`);
+        console.log(`${new Date().toLocaleTimeString('en-GB', { hour12: false })}.${String(Date.now() % 1000).padStart(3, '0')}  ${c.cid.padEnd(16)} ${String(Math.round(out.latencyMs)).padStart(5)} ms  ${what}${out.tokens ? ` · ${out.tokens} tok` : ''}${cost}${out.drift ? ' · DRIFT' : ''}`);
       }
       return send(res, 200, out);
     }

@@ -292,3 +292,15 @@ A local imitation fine-tune of Laya (teacher: Nearest-Car ETA v1.3.0; encoding 3
 - **Accuracy against the teacher:** 0.249 → 0.928 on 1,601 held-out decisions.
 
 As expected, imitation reaches its teacher and doesn't pass it. Next: hindsight labels, and a second building profile.
+
+## 20. Accuracy, measured latency, hindsight labels and a second building (2026-09-28)
+
+- **Jev's accuracy:** on the pilot's 1,601 held-out decisions (encoding 3), Jev agrees with Nearest-Car ETA v1.3.0 on **90.3%** (base Laya 24.9%, pilot fine-tune 92.8%). $0.033.
+- **Demo set 2, measured decision time:** Jev encoding 3 (~0.20 s per decision, counted) vs Nearest-Car (instant): 31.1 / 43.4 s against 30.7 / 42.4 s, **not separable**. $0.018.
+- **Hindsight labels** (`runner/tools/hindsight.ts`: fork each decision per option, continue with Nearest-Car for 90 s, score by total waiting):
+  - **The rollout acting on them online** reaches 25.2 / 36.9 s, but it's an **oracle**: the forks replay the real future arrivals.
+  - **Laya fine-tuned on them** reaches **31.5 / 42.7 s**, tying the pilot, Nearest-Car and Jev. It captured none of the oracle's gap: the labels depend on arrivals the state doesn't show.
+- **Second building** (12 × 3, evening down-peak):
+  - **The office imitation fine-tune transfers:** 47.7 s, tied with Jev and Nearest-Car v1.2.0, and separably better than v1.3.0 (−1.6 s).
+  - **A per-building hindsight fine-tune** (2,109 samples) **collapsed**: a near-uniform output with a positional lean, "always car A" on 200/200 held-out decisions, 84.8 s average wait.
+  - **Lessons:** shuffle option order, check prediction distributions rather than accuracy, keep the best epoch, validate by racing.
