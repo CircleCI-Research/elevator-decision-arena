@@ -76,7 +76,7 @@
             <div class="au-dec-detail" data-r="detail"></div>
           </section>
           <section class="au-events card">
-            <div class="card-h"><span class="card-k">Event log</span><span class="mock" data-r="evCount"></span></div>
+            <div class="card-h"><span class="card-k">Event log</span><span class="tag-soft" data-r="evCount"></span></div>
             <ol class="au-ev-list" data-r="events"></ol>
           </section>
         </div>`;
@@ -252,10 +252,12 @@
       const all = v.defHashOk && v.decisionsOk && v.fingerprintOk !== false && integrityOk;
       // A run recorded by an older simulator replays under today's, so a
       // mismatch there says nothing about tampering. Say so, don't fail it.
-      const oldSim = b.simulator && b.simulator !== EDA.history.SIM_VERSION;
+      const sim = EDA.history.simName(b.simulator);
+      const oldSim = sim && sim !== EDA.history.SIM_VERSION;
+      const renamed = b.simulator && sim !== b.simulator ? ` · recorded as ${esc(b.simulator)}, the simulator's former name` : '';
       const verdict = oldSim
-        ? `<div class="au-verdict">${icon('info')}<b>Older simulator</b><small>recorded with ${esc(b.simulator)}; this page runs ${esc(EDA.history.SIM_VERSION)}, so the replay can't confirm it</small></div>`
-        : `<div class="au-verdict ${all ? 'ok' : 'bad'}">${icon(all ? 'shield' : 'alert')}<b>${all ? 'Verified' : 'Verification failed'}</b><small>replayed in ${Math.round(v.ms)} ms</small></div>`;
+        ? `<div class="au-verdict">${icon('info')}<b>Older simulator</b><small>recorded with ${esc(sim)}${renamed}; this page runs ${esc(EDA.history.SIM_VERSION)}, so the replay can't confirm it</small></div>`
+        : `<div class="au-verdict ${all ? 'ok' : 'bad'}">${icon(all ? 'shield' : 'alert')}<b>${all ? 'Verified' : 'Verification failed'}</b><small>replayed in ${Math.round(v.ms)} ms${renamed}</small></div>`;
       this.r.verify.innerHTML = `
         ${verdict}
         <div class="au-check">${ok(v.defHashOk)}<div><b>Definition</b><span>Hash <code>${v.defHash}</code> ${v.defHashOk ? 'recomputed from the definition' : `≠ recorded <code>${b.defHash}</code>`}</span></div></div>

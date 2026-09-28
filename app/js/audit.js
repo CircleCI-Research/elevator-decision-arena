@@ -97,7 +97,7 @@
     if (!b.definition || !b.decisions || !Array.isArray(b.contestants)) throw new Error('Run file is missing its definition or decisions');
     for (const c of b.contestants) {
       // A contestant no longer registered (a live model with the runner off,
-      // or a retired one such as the old mocks) replays from its record.
+      // or a retired one such as the early scripted stand-ins) replays from its record.
       if (!Array.isArray(b.decisions[c.key])) throw new Error(`No decisions recorded for contestant ${c.key}`);
     }
     return b;
@@ -201,7 +201,7 @@
     const cfg = makeConfig(d.floors, d.cars, { seed: d.seed, events: d.events, scenario, timing: d.timing });
     const script = buildScript(cfg);
     // Registered contestants replay through the registry; anyone else (a
-    // live model without its runner, a retired mock) from the record alone.
+    // live model without its runner, a retired stand-in) from the record alone.
     const contestants = bundle.contestants.map((c) => ({ key: c.key, policy: EDA.registry.get(c.id, c.version) ?? EDA.registry.recorded(c) }));
     const worlds = contestants.map((c) => new EDA.World({ id: c.key, cfg, script, policy: new ReplayPolicy(c.policy, bundle.decisions[c.key]) }));
     return { cfg, script, contestants, worlds };
@@ -235,7 +235,8 @@
         return [w.id, { captured: p.captured, recorded: p.log.length, replayed: p.captured.length, matched: p.captured.filter((c) => c.match).length, divergedAt: p.divergedAt }];
       })
     );
-    const defHash = definitionHash(cfg, contestants);
+    // Hashed under the simulator id the file was recorded with (it may be a former name).
+    const defHash = definitionHash(cfg, contestants, bundle.simulator ?? SIM_VERSION);
     const logHash = decisionsHash(bundle.decisions);
     const sameRun = reference && reference.defHash === bundle.defHash && reference.createdAt === bundle.run.createdAt;
     return {

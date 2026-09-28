@@ -26,18 +26,18 @@ Elevator Decision Arena compares elevator dispatch policies under identical cond
 
 ## 2. What v1 already establishes
 
-The v1 app (`app/js/sim/registry.js`, originally with eight mock contestants, now four algorithms plus live models from the runner) has a working registry, and the rest of the app already consumes it generically:
+The v1 app (`app/js/sim/registry.js`, originally with eight scripted stand-in contestants, now four algorithms plus live models from the runner) has a working registry, and the rest of the app already consumes it generically:
 
 - Lane A and Lane B pickers in New experiment; any pairing except a policy against itself.
 - Kind-specific provenance stored in every run record and run file (prompt and config hashes for models, source and code hash for algorithms).
 - Replay feeds recorded decisions back in and never re-asks the policy. Verification checks the definition hash, per-decision request matching, the result fingerprint and a decision-log hash.
 - Leaderboard and SLA lab treat contestants as a league (registry colours, provisional status below 5 runs).
 
-The engine phase keeps these behaviours and replaces the mocks with real adapters. Three shortcuts from the early app must **not** carry over into the engine (see §4.3):
+The engine phase keeps these behaviours and replaces the stand-ins with real adapters. Three shortcuts from the early app must **not** carry over into the engine (see §4.3):
 
 1. In-process algorithms build their own list of options. In the engine, **the engine** offers the legal options.
 2. In-process algorithms report their own latency. In the engine, **the engine** measures it.
-3. The early mock "models" were scripted softmaxes (since removed). Real models run through adapters.
+3. The early stand-in "models" were scripted softmaxes (since removed). Real models run through adapters.
 
 ## 3. Concepts
 

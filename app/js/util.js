@@ -34,7 +34,7 @@ window.EDA = window.EDA || {};
   }
 
   // Shared building geometry. The view draws in these viewBox units and the
-  // mock world walks passengers in metres derived from the same numbers, so
+  // simulator walks passengers in metres derived from the same numbers, so
   // the two can never disagree about where a shaft is.
   function geometry(floors, cars) {
     const FH = Math.min(78, Math.max(26, 468 / floors)); // floor height shrinks, then the building grows

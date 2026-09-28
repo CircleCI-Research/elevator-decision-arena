@@ -9,7 +9,7 @@
  *     facets: endpoint, pinned model, encoding, limits.
  * All of them see the same observation and answer with the same action.
  *
- * The scripted mock models used before the real ones were connected have
+ * The scripted stand-in models used before the real ones were connected have
  * been removed. Runs that used them keep their recorded names and replay
  * from their records alone (see recorded()).
  */
@@ -289,7 +289,7 @@
       .slice(0, 3)
       .map((w) => w[0].toUpperCase())
       .join('') || '?';
-  // Last meaningful number of a version: v1.3.0 → 3, mock-0.2 → 2.
+  // Last meaningful number of a version: v1.3.0 → 3, 0.2 → 2.
   const versionTag = (v) => (String(v).match(/\d+/g) ?? []).reverse().find((x) => x !== '0') ?? '';
   // Badges are unique across the registry: initials, plus the version when
   // two entries would otherwise look the same.

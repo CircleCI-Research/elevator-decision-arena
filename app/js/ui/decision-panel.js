@@ -64,7 +64,7 @@
           <div class="dp-foot" data-r="foot"></div>
         </div>
         <div class="dp-hist">
-          <div class="dp-hist-h"><span>Recent decisions</span><span class="mock">${this.live ? 'live model' : this.model ? 'recorded model' : 'algorithm'}</span></div>
+          <div class="dp-hist-h"><span>Recent decisions</span><span class="tag-soft">${this.live ? 'live model' : this.model ? 'recorded model' : 'algorithm'}</span></div>
           <ol data-r="hist"></ol>
         </div>`;
       this.r = {};

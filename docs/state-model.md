@@ -4,7 +4,7 @@ Status: **draft for review** · 2026-09-27 · companion to [contestants.md](cont
 
 ## 1. Why this needs its own model
 
-Every decision a contestant makes depends on what it is told. Today the app's observation is a handful of fields written inline in `world.js` (`observe()`) and described informally in `SCHEMAS`. That was enough for a mock, but it breaks down as soon as the arena grows:
+Every decision a contestant makes depends on what it is told. Today the app's observation is a handful of fields written inline in `world.js` (`observe()`) and described informally in `SCHEMAS`. That was enough for an early version, but it breaks down as soon as the arena grows:
 
 - **Buildings will differ:** priority floors, cars with different capacities or speeds, cars that only serve some floors, destination panels in the lobby.
 - **The information rules may change:** the spec says models may know only each car's total load and capacity. Some future experiment may want to test what happens when a policy also knows each passenger's weight, so it can move most of the weight straight to its floors.

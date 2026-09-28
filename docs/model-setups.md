@@ -158,7 +158,7 @@ Nearest-Car ETA joins every set as the reference algorithm, because Laya's base 
 3. **Setup facets and check:** facet hashing in the registry, the setup-check panel in New experiment, verdicts in run records, and the leaderboard filter.
 4. **Demo sets 1–3**, then a write-up of the results.
 
-The facets and the setup check can be built into the **app first**, with mock Laya and Jev contestants, so the UI can be reviewed before any real call is made.
+The facets and the setup check can be built into the **app first**, with scripted stand-in Laya and Jev contestants, so the UI can be reviewed before any real call is made.
 
 ## 10. Decisions
 
@@ -171,7 +171,7 @@ The facets and the setup check can be built into the **app first**, with mock La
 
 ## 11. Status in the app
 
-The setup check is built into the app (`app/js/setup.js`, `app/js/ui/setup-view.js`), first with mock contestants (since removed):
+The setup check is built into the app (`app/js/setup.js`, `app/js/ui/setup-view.js`), first with scripted stand-in contestants (since removed):
 
 - **Laya · local** and **Jev · API** in encodings 1 and 2, with facets as in §5 and scripted quality and latency. There are no calls and no keys.
 - **Decision timing:** `measured` or `fixed`, and each contestant's own timeout or a shared one. Timeouts hand the decision to the fallback, and the handover is recorded, replayed and verified.
@@ -189,7 +189,7 @@ These were real calls to `api.typesafe.ai`, with the key loaded from `~/.config/
 | Pinned model | Requests with `"model": "jev-1.13.0"` are accepted, and every response reported `jev-1.13.0`. The drift check can compare this field. |
 | Response shape | `choice`, `confidence` and **`probabilities` for every option**, plus `usage.input_tokens`. It matches the adapter design. |
 | Size and cost | 513 input tokens (encoding 1) and 470 (encoding 2), about $0.00002 per decision. |
-| Latency, 10 sequential calls each | p50 ~190 ms, range 173–339 ms, from this machine. The mock is now calibrated to this. |
+| Latency, 10 sequential calls each | p50 ~190 ms, range 173–339 ms, from this machine. The stand-in is now calibrated to this. |
 | Same bytes, same answer? | **The top choice was stable** (A in 10/10, both encodings). **The probabilities were not**: 10 distinct distributions out of 10 for byte-identical requests, with P(A) between 0.79 and 0.86 (encoding 1) and between 0.62 and 0.78 (encoding 2). |
 | Encoding effect (one fixture) | Encoding 2 made Jev *less* certain: P(A) around 0.72 against around 0.84, with more weight on the idle empty car 5 floors above. One fixture proves nothing. This is what demo set 3 is for. |
 
@@ -217,7 +217,7 @@ Consequences:
 
 **A gotcha:** `laya-serve --help` has no help. It starts a server bound to `0.0.0.0:8000` with no authentication, even with `LAYA_HOST` unset. That happened once during this spike and was stopped within minutes. `serve.sh` exists so the server is only ever started locked down.
 
-**Mocks calibrated:** Laya · local now uses the measured latency (34–40 ms), takes the top option (it is deterministic), and has its decision noise raised so it performs near chance, just below round robin over 10 seeds. Jev · API uses its measured 173–339 ms.
+**Stand-ins calibrated:** Laya · local now uses the measured latency (34–40 ms), takes the top option (it is deterministic), and has its decision noise raised so it performs near chance, just below round robin over 10 seeds. Jev · API uses its measured 173–339 ms.
 
 **Reproduce:** start `runtime/laya/serve.sh` in one terminal. Then run `set -a; . ~/.config/elevator-arena/env; set +a; node docs/spike/repeat.mjs laya` (or `jev`).
 
@@ -261,7 +261,7 @@ Paired by seed, on average wait:
 
 Framing, doing the arithmetic in the encoding, closes Jev's gap to the heuristic but doesn't exceed it. Beating the heuristic will need information it ignores (call history, patterns specific to the building) or, for Laya, fine-tuning.
 
-## 17. Simulator fix: mock-world 0.2 (2026-09-27)
+## 17. Simulator fix: eda-sim 0.2 (2026-09-27)
 
 Watching a run showed a passenger stepping out of the same overloaded car again and again. There were two bugs in the simulated world:
 
@@ -270,9 +270,9 @@ Watching a run showed a passenger stepping out of the same overloaded car again 
 
 Across 240 runs (4 scenarios × 2 sizes × 30 seeds), passengers stepping out of the same car more than once dropped from 20 to 0. Step-offs dropped from 1,890 to 1,783. All 480 runs of a wider check (every scenario, 3 policies, 4 sizes) still finish.
 
-The simulator version is now `mock-world 0.2`. Runs from 0.1 form their own Leaderboard and SLA families, labelled as the older simulator, and Audit reports them as "Older simulator" rather than failing them. **Demo sets 1 and 3 (§15–16) were recorded with 0.1 and need re-running under 0.2** before their numbers are used.
+The simulator version is now `eda-sim 0.2` (called `mock-world 0.2` until it was renamed on 2026-09-28; same code and results, and records under the old name are migrated or accepted as the same simulator). Runs from 0.1 form their own Leaderboard and SLA families, labelled as the older simulator, and Audit reports them as "Older simulator" rather than failing them. **Demo sets 1 and 3 (§15–16) were recorded with 0.1 and need re-running under 0.2** before their numbers are used.
 
-## 18. Demo sets 1 and 3 re-run on mock-world 0.2 (2026-09-27)
+## 18. Demo sets 1 and 3 re-run on eda-sim 0.2 (2026-09-27)
 
 The same design, 100 runs, 2,607 Jev calls ($0.053), 0 errors, fallbacks or drift. Every mean moved by at most about 1 s, and the conclusions of §15–16 hold:
 
@@ -285,7 +285,7 @@ These supersede the 0.1 tables in §15–16.
 
 ## 19. Pilot fine-tune rematch (2026-09-28)
 
-A local imitation fine-tune of Laya (teacher: Nearest-Car ETA v1.3.0; encoding 3; 4,382 examples from seeds 1–60; validation seeds 501–520; about 24 min on an Apple M4 Pro, fp32), served privately by `runtime/laya/serve_local.py` and pinned by its weights hash. It raced base Laya on the demo-set design (mock-world 0.2, 24 × 4, seeds 1001–1010, fixed 0.25 s; *Controlled · decider*):
+A local imitation fine-tune of Laya (teacher: Nearest-Car ETA v1.3.0; encoding 3; 4,382 examples from seeds 1–60; validation seeds 501–520; about 24 min on an Apple M4 Pro, fp32), served privately by `runtime/laya/serve_local.py` and pinned by its weights hash. It raced base Laya on the demo-set design (eda-sim 0.2, 24 × 4, seeds 1001–1010, fixed 0.25 s; *Controlled · decider*):
 
 - **Against base Laya:** average wait **30.9 / 43.4 s** against 40.3 / 50.7 s, **−9.4 / −7.3 s, better on 10/10 seeds in both scenarios**.
 - **Against the rest:** indistinguishable from Nearest-Car ETA (v1.2.0 30.6 / 43.0; v1.3.0 31.0 / 42.9) and from Jev with encoding 3 (31.1 / 43.6). Separably better than round robin on Normal traffic (−2.5 s).

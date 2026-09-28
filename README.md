@@ -115,7 +115,7 @@ Open the app **from the runner's address**. Opened any other way, it has only th
 - [docs/laya-adapter.md](docs/laya-adapter.md): running Laya locally, encodings, identity, calibration, and fine-tuning data.
 - [docs/model-setups.md](docs/model-setups.md): local and API models, setup facets and the setup check. It also records the spikes and demo results so far (§12–18).
 
-## Results so far (simulated building, mock-world 0.2)
+## Results so far (simulated building, eda-sim 0.2)
 
 24 floors × 4 cars, the same 10 seeds for every contestant, fixed decision time, mean average wait (Normal traffic / Morning Wave). Differences were tested seed by seed (paired) from the exported run records:
 

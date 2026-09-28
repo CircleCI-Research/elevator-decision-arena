@@ -1,5 +1,5 @@
 /*
- * The simulator (mock-world): a simplified elevator world, deterministic for a seed.
+ * The simulator (eda-sim): a simplified elevator world, deterministic for a seed.
  *
  * Simplified by design: it models the behaviour the benchmark needs, the least behavior
  * that makes every visual state appear: calls, duplicate presses, boarding,

@@ -116,7 +116,7 @@
     constructor(host, contestants) {
       this.contestants = contestants;
       host.innerHTML = `
-        <div class="card-h"><span class="card-k">First to clear the wave</span><span class="mock" title="The building and its traffic are simulated; the decisions are real">simulated</span></div>
+        <div class="card-h"><span class="card-k">First to clear the wave</span><span class="tag-soft" title="The building and its traffic are simulated; the decisions are real">simulated</span></div>
         <div class="race-rows">
           ${contestants
             .map(
@@ -221,7 +221,7 @@
           : `<tr><th>${m.label}</th>${contestants.map(() => '<td>—</td>').join('')}</tr>`
       ).join('');
       host.innerHTML = `
-        <div class="card-h"><span class="card-k">Scoreboard</span><span class="mock" title="Measured in the simulated building">simulated</span></div>
+        <div class="card-h"><span class="card-k">Scoreboard</span><span class="tag-soft" title="Measured in the simulated building">simulated</span></div>
         <table class="score-t"><thead><tr><th></th>${head}</tr></thead><tbody>${body}</tbody></table>`;
       const rows = [...host.querySelectorAll('tbody tr:not(.grp)')];
       this.metrics = METRICS.filter((m) => !m.group).map((m, i) => ({ ...m, cells: [...rows[i].querySelectorAll('td')] }));

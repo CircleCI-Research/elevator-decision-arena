@@ -177,7 +177,7 @@ button { font: inherit; color: inherit; }
 }
 .card-h { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
 .card-k { font: 600 10.5px var(--font-ui); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); }
-.mock {
+.tag-soft {
   font: 600 9.5px var(--font-ui);
   letter-spacing: 0.08em;
   text-transform: uppercase;

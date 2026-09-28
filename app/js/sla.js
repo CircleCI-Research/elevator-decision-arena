@@ -140,7 +140,8 @@
     const e = ev(r);
     const on = [e.heavy && 'heavy group', e.spike && 'demand spike'].filter(Boolean);
     const tag = EDA.scenario.timingTag(r.def.timing);
-    const old = r.sim && r.sim !== EDA.history.SIM_VERSION ? ` · ${r.sim} (older simulator)` : '';
+    const sim = EDA.history.simName(r.sim);
+    const old = sim && sim !== EDA.history.SIM_VERSION ? ` · ${sim} (older simulator)` : '';
     return `${r.def.scenario} · ${r.def.floors} × ${r.def.cars} · ${on.length ? on.join(' · ') : 'no other events'}${tag ? ` · ${tag}` : ''}${old}`;
   }
 

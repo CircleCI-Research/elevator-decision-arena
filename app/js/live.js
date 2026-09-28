@@ -5,7 +5,7 @@
  * Jev through the API) join the registry. The runner holds the keys and
  * talks to the models; this page only sends the observation and the legal
  * options, and gets back probabilities, timings and the raw request and
- * response. Opened any other way, the page runs on mocks alone.
+ * response. Opened any other way, the page runs the algorithms alone.
  */
 (function (EDA) {
   'use strict';

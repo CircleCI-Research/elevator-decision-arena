@@ -31,14 +31,15 @@
   function familyKey(r) {
     const e = ev(r);
     const tag = EDA.scenario.timingTag(r.def.timing);
-    return JSON.stringify([r.sim, r.def.scenarioKey ?? r.def.scenario, r.def.floors, r.def.cars, !!e.heavy, !!e.fault, !!e.spike, ...(tag ? [tag] : [])]);
+    return JSON.stringify([EDA.history.simName(r.sim), r.def.scenarioKey ?? r.def.scenario, r.def.floors, r.def.cars, !!e.heavy, !!e.fault, !!e.spike, ...(tag ? [tag] : [])]);
   }
 
   function familyLabel(r) {
     const e = ev(r);
     const on = [e.heavy && 'heavy', e.fault && 'fault', e.spike && 'spike'].filter(Boolean);
     const tag = EDA.scenario.timingTag(r.def.timing);
-    const old = r.sim && r.sim !== EDA.history.SIM_VERSION ? ` · ${r.sim} (older simulator)` : '';
+    const sim = EDA.history.simName(r.sim);
+    const old = sim && sim !== EDA.history.SIM_VERSION ? ` · ${sim} (older simulator)` : '';
     return `${r.def.scenario} · ${r.def.floors} × ${r.def.cars} · ${on.length ? on.join(' · ') : 'no events'}${tag ? ` · ${tag}` : ''}${old}`;
   }
 

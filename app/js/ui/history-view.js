@@ -438,7 +438,7 @@
         ['Contestants', versions],
         ['Decision timing', (r) => timingText(r.def)],
         ['Setup check', (r) => EDA.setup.ofRecord(r)?.short ?? '—'],
-        ['Simulator', (r) => r.sim],
+        ['Simulator', (r) => EDA.history.simName(r.sim)],
         ['Run modes', (r) => r.modes.map((m) => (m === 'fast' ? 'max speed' : 'timeline')).join(' → '), 'wall-clock only'],
         ['Definition hash', (r) => `<code>${r.defHash}</code>`],
       ];
@@ -517,7 +517,7 @@
         ['Scripted events', eventsShort(r.def.events)],
         ['Decision timing', timingText(r.def)],
         ['Run modes', r.modes.map((m) => (m === 'fast' ? 'max speed' : 'timeline')).join(' → ')],
-        ['Simulator', r.sim],
+        ['Simulator', EDA.history.simName(r.sim)],
         ['Definition hash', `<code>${r.defHash}</code>`],
         ['Result fingerprint', r.fingerprint ? `<code>${r.fingerprint}</code>` : '—'],
       ];

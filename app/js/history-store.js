@@ -13,27 +13,48 @@
   // 0.2: a passenger who stepped out to clear an overload no longer re-boards
   // the same car while it is still too full for them (0.1 let them retry at
   // every stop). Results differ, so runs from different versions never mix.
-  const SIM_VERSION = 'mock-world 0.2';
+  const SIM_VERSION = 'eda-sim 0.2';
+  // The simulator's earlier name, for records made before it was renamed.
+  // Same code and same results; only the label changed.
+  const FORMER_NAMES = { 'mock-world 0.1': 'eda-sim 0.1', 'mock-world 0.2': 'eda-sim 0.2' };
+  const simName = (id) => FORMER_NAMES[id] ?? id;
   const SERIES_POINTS = 120;
 
   const { fnv } = EDA.util;
 
   // Everything that can change simulated results, and nothing that can't
-  // (run mode and mock inference time only affect wall-clock).
-  function definitionHash(cfg, contestants) {
+  // (run mode and decision wall-clock only affect wall-clock). `def` is a
+  // config or a stored definition; `ids` are [lane, contestant id, version].
+  function hashDefinition(def, ids, sim) {
     return fnv(
       JSON.stringify({
-        sim: SIM_VERSION,
-        scenario: cfg.scenarioKey ?? cfg.scenario, // Morning Wave keeps its original key
-        floors: cfg.floors,
-        cars: cfg.cars,
-        seed: cfg.seed,
-        events: cfg.events,
-        contestants: contestants.map((c) => [c.key, c.policy.id, c.policy.version]),
+        sim,
+        scenario: def.scenarioKey ?? def.scenario, // Morning Wave keeps its original key
+        floors: def.floors,
+        cars: def.cars,
+        seed: def.seed,
+        events: def.events,
+        contestants: ids,
         // Default timing adds nothing, so older definitions keep their hash.
-        ...(EDA.scenario.isDefaultTiming(cfg.timing) ? {} : { timing: cfg.timing }),
+        ...(EDA.scenario.isDefaultTiming(def.timing) ? {} : { timing: def.timing }),
       })
     );
+  }
+
+  function definitionHash(cfg, contestants, sim = SIM_VERSION) {
+    return hashDefinition(cfg, contestants.map((c) => [c.key, c.policy.id, c.policy.version]), sim);
+  }
+
+  // A stored record made under a former simulator name gets the current name
+  // and the hash that name gives. Only when its recorded hash checks out.
+  function renameSim(r) {
+    const to = FORMER_NAMES[r.sim];
+    if (!to || !r.def || !Array.isArray(r.contestants)) return false;
+    const ids = r.contestants.map((c) => [c.key, c.id, c.version]);
+    if (hashDefinition(r.def, ids, r.sim) !== r.defHash) return false;
+    r.sim = to;
+    r.defHash = hashDefinition(r.def, ids, to);
+    return true;
   }
 
   // Simulated outcomes only; identical definitions must reproduce this.
@@ -142,6 +163,7 @@
         const raw = localStorage.getItem(KEY);
         const arr = raw ? JSON.parse(raw) : [];
         this.records = Array.isArray(arr) ? arr : [];
+        if (this.records.map(renameSim).some(Boolean)) localStorage.setItem(KEY, JSON.stringify(this.records));
         localStorage.setItem(`${KEY}-probe`, '1');
         localStorage.removeItem(`${KEY}-probe`);
       } catch (_) {
@@ -220,5 +242,5 @@
     }
   }
 
-  EDA.history = { HistoryStore, fromRun, definitionHash, fnv, SIM_VERSION };
+  EDA.history = { HistoryStore, fromRun, definitionHash, fnv, SIM_VERSION, simName };
 })(window.EDA);
