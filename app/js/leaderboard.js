@@ -83,7 +83,7 @@
       longest: res.longest,
       energyPerPax: res.delivered ? res.energyWh / res.delivered : null,
       emptyPerPax: res.delivered ? res.emptyFloors / res.delivered : null,
-      decTime: res.avgLatency,
+      decTime: res.decTime ?? null, // measured; null when it wasn't
       decEnergy: res.remoteDecisions ? null : res.decisionWh, // remote inference energy is not measurable
       vetoRate: res.decisions ? (res.vetoes / res.decisions) * 100 : 0,
     };
@@ -97,11 +97,11 @@
     { key: 'fairness', label: 'Fairness', metric: 'longest', desc: 'Longest wait: the worst-served passenger', fmt: 'secs', better: 'low', overall: true },
     { key: 'resilience', label: 'Resilience', metric: 'degradation', desc: 'Extra time to clear with the car fault, vs the same seed without it', fmt: 'pct', better: 'low', overall: true },
     { key: 'safety', label: 'Safety', metric: 'vetoRate', desc: 'Decisions vetoed by the safety layer, per 100', fmt: 'num', better: 'low', overall: true },
-    { key: 'cost', label: 'Decision cost', metric: 'decTime', desc: 'Average time to produce a decision', fmt: 'ms', better: 'low', overall: true },
+    { key: 'cost', label: 'Decision cost', metric: 'decTime', desc: 'Measured time the contestant took per decision', fmt: 'ms', better: 'low', overall: true },
     { key: 'p95', label: 'P95 wait', metric: 'p95Wait', desc: '95th-percentile wait', fmt: 'secs', better: 'low', overall: false },
     { key: 'energy', label: 'Energy', metric: 'energyPerPax', desc: 'Elevator energy per passenger delivered', fmt: 'wh', better: 'low', overall: false },
     { key: 'utilization', label: 'Utilization', metric: 'emptyPerPax', desc: 'Empty travel per passenger (floors)', fmt: 'fl', better: 'low', overall: false },
-    { key: 'decEnergy', label: 'Decision energy', metric: 'decEnergy', desc: 'Estimated energy spent deciding, per run', fmt: 'wh', better: 'low', overall: false },
+    { key: 'decEnergy', label: 'Decision energy', metric: 'decEnergy', desc: 'Estimated energy spent deciding, per run: a fixed per-decision figure for each contestant × its decisions, not measured', fmt: 'wh', better: 'low', overall: false, estimate: true },
   ];
 
   // Same contestants, building and seed, fault flipped: the run that
@@ -173,7 +173,11 @@
       }
     }
 
-    const categories = CATEGORIES.map((cat) => {
+    // Fixed decision time compares decision quality only: how long deciding
+    // took is shown, but it doesn't rank anyone in such a family.
+    const fixed = runs.length > 0 && EDA.scenario.normTiming(runs[0].def.timing).mode === 'fixed';
+    const cats = CATEGORIES.map((c) => (fixed && c.key === 'cost' ? { ...c, overall: false, note: 'not ranked: this family uses fixed decision time' } : c));
+    const categories = cats.map((cat) => {
       const rows = [...contestants.values()].map((c) => ({ c, s: stats(values.get(c.cid)[cat.metric] ?? []) }));
       const ranked = rows.filter((r) => r.s.n > 0).sort((a, b) => (cat.better === 'low' ? a.s.mean - b.s.mean : b.s.mean - a.s.mean));
       let leader = null;
@@ -190,6 +194,8 @@
       ranked.forEach((r, i) => (r.rank = i + 1));
       // A category counts once at least two contestants have data in it;
       // contestants without data there simply aren't ranked in it.
+      // An estimate isn't evidence: no leader, no separability.
+      if (cat.estimate) return { ...cat, rows, leader: null, separable: false, hasData: ranked.length >= 2 };
       return { ...cat, rows, leader, separable, hasData: ranked.length >= 2 };
     });
 

@@ -24,8 +24,9 @@ The Leaderboard ranks contestants **within one experiment family**: runs that sh
    | Fairness | Longest wait (the worst-served passenger) | yes |
    | Resilience | Extra time to clear with the car fault, against the same seed without it (needs fault pairs) | yes |
    | Safety | Decisions vetoed by the safety layer, per 100 | yes |
-   | Decision cost | Average time to produce a decision | yes |
-   | P95 wait, Energy, Utilization, Decision energy | shown for context | no |
+   | Decision cost | Measured time the contestant took per decision | yes, except in fixed-timing families (see below) |
+   | P95 wait, Energy, Utilization | shown for context | no |
+   | Decision energy | an **estimate** (a fixed figure per decision × decisions), shown without an interval or a leader | no |
 
    Lower is better in every category.
 
@@ -34,5 +35,6 @@ The Leaderboard ranks contestants **within one experiment family**: runs that sh
 - **"Not separable" doesn't mean "equal".** It means 10 seeds couldn't tell the two apart. Run 20 seeds if the question matters.
 - **The intervals are per contestant, not paired by seed.** Two contestants on the same seeds can differ more reliably than overlapping intervals suggest. For a paired, seed-by-seed comparison, compare their runs seed by seed (see [How to compare runs](how-to-compare-runs.md)), or do it offline from the run files.
 - **Resilience needs fault pairs.** Without them, that card says so and the category doesn't count.
+- **Decision cost under fixed timing** is the real time each contestant took, shown for information but not ranked: those families compare decision quality only. Runs recorded before real times were kept show it as *not measured*.
 - **Fixed vs measured timing are different families.** A contestant ranked under fixed 0.25 s decisions (quality only) isn't ranked against measured-latency runs.
 - **Older-simulator runs** (recorded before a simulator fix) form their own family, labelled *older simulator*, and never mix with current ones.

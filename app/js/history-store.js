@@ -41,6 +41,29 @@
     );
   }
 
+  // Records made before decision time was measured: under fixed timing their
+  // average was the fixed time itself, so it's unknown; under measured
+  // timing the charged time was the measured one. Nearest-Car ETA v1.2.0 also
+  // carried a placeholder identity and source; give it the real ones.
+  function backfill(r) {
+    let changed = false;
+    const fixed = EDA.scenario.normTiming(r.def?.timing).mode === 'fixed';
+    for (const res of Object.values(r.results ?? {})) {
+      if (res && !('decTime' in res)) {
+        res.decTime = fixed ? null : res.avgLatency ?? null;
+        changed = true;
+      }
+    }
+    for (const c of r.contestants ?? []) {
+      if (c.id === 'nearest-car-eta' && c.version === 'v1.2.0' && c.identity === 'sha256 3f9a…c21e') {
+        c.identity = 'plain ETA';
+        if (c.algorithm?.source === 'algorithms/nearest-car-eta.js') c.algorithm.source = 'registry.js · nearestEta()';
+        changed = true;
+      }
+    }
+    return changed;
+  }
+
   function definitionHash(cfg, contestants, sim = SIM_VERSION) {
     return hashDefinition(cfg, contestants.map((c) => [c.key, c.policy.id, c.policy.version]), sim);
   }
@@ -102,6 +125,7 @@
         emptyFloors: s.emptyFloors,
         decisions: s.decisions,
         avgLatency: s.avgLatency,
+        decTime: s.decTime,
         decisionWh: s.decisionWh,
         vetoes: s.vetoes,
         fallbacks: s.fallbacks,
@@ -163,7 +187,7 @@
         const raw = localStorage.getItem(KEY);
         const arr = raw ? JSON.parse(raw) : [];
         this.records = Array.isArray(arr) ? arr : [];
-        if (this.records.map(renameSim).some(Boolean)) localStorage.setItem(KEY, JSON.stringify(this.records));
+        if (this.records.map((r) => [renameSim(r), backfill(r)].some(Boolean)).some(Boolean)) localStorage.setItem(KEY, JSON.stringify(this.records));
         localStorage.setItem(`${KEY}-probe`, '1');
         localStorage.removeItem(`${KEY}-probe`);
       } catch (_) {

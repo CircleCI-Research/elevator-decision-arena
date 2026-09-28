@@ -188,11 +188,14 @@
       node.textContent = value;
     }
 
+    // Measured time, not the time charged in the simulation (under fixed
+    // timing that's the same fixed value for everyone).
     latencyLabel(D) {
-      if (!this.model) return '< 0.1 ms';
-      if (!D.count) return '—';
+      if (!D.decided) return '—';
+      const avg = D.measuredSum / D.decided;
+      if (!this.model) return EDA.util.decTime(avg);
       // Fixed-width format so the header never reflows as values change.
-      return `${D.lastLatency.toFixed(2)} s · avg ${(D.latencySum / D.count).toFixed(2)} s`;
+      return `${D.lastMeasured.toFixed(2)} s · avg ${avg.toFixed(2)} s`;
     }
 
     statusHtml(dec, thinking) {

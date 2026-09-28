@@ -326,7 +326,7 @@
               <span class="d-t">${clock(t)}</span>
               <span class="d-req">${esc(reqLabel(c.req))}</span>
               <span class="d-choice">${c.match ? `${choiceLabel(c.rec)}${c.rec.fallback ? ' <b class="v-warn">fallback</b>' : ''}` : '<b class="v-bad">diverged</b>'}</span>
-              <span class="d-lat">${rec ? (rec.latency ? `${Math.round(rec.latency * 1000)} ms` : '< 0.1 ms') : '—'}</span>
+              <span class="d-lat">${rec ? EDA.util.decTime(rec.measured ?? rec.latency) : '—'}</span>
               <span class="d-out o-${rec?.outcome ?? 'none'}">${rec?.outcome ?? '—'}</span>
             </button>`;
         })
@@ -363,7 +363,7 @@
         : '';
       this.r.detail.innerHTML = `
         ${mismatch}
-        <h3>${esc(reqLabel(c.req))} <small>at ${clock(o.t)} sim · latency ${rec?.latency ? `${Math.round(rec.latency * 1000)} ms` : '< 0.1 ms'}</small></h3>
+        <h3>${esc(reqLabel(c.req))} <small>at ${clock(o.t)} sim · took ${rec ? EDA.util.decTime(rec.measured ?? rec.latency) : '—'}${rec && Math.abs((rec.measured ?? rec.latency) - rec.latency) > 1e-3 ? ` · charged ${EDA.util.decTime(rec.latency)} in the simulation` : ''}</small></h3>
         ${
           rec?.fallback
             ? `<p class="au-mismatch au-fallback">${icon('clock')}<span>The contestant took <b>${Math.round(rec.measured * 1000)} ms</b>, over the ${Math.round(rec.fallback.limitS * 1000)} ms timeout. Its choice (${esc(rec.options[rec.fallback.choice]?.label ?? '—')}, ${Math.round((rec.fallback.probs[rec.fallback.choice] ?? 0) * 100)}%) was discarded, and <b>${esc(EDA.registry.byCid(rec.fallback.by)?.name ?? rec.fallback.by)}</b> decided instead.</span></p>`

@@ -116,9 +116,9 @@ Records live in this browser's `localStorage` (`eda-history-v1`, newest 200). If
   - Fairness: longest wait.
   - Resilience: extra clear time with the fault, vs the same seed without it (needs fault pairs).
   - Safety: vetoes per 100 decisions.
-  - Decision cost: average decision time.
+  - Decision cost: the measured time a contestant took per decision (algorithms are timed too). In families with fixed decision time it's shown but not ranked, since those compare decision quality only. Runs recorded before real times were kept show it as *not measured*.
 - A category's leader is called **separable** only when the intervals don't overlap. Otherwise it says "ahead · not separable".
-- **More metrics** (shown, not ranked): P95 wait, energy per passenger, empty travel per passenger, decision energy.
+- **More metrics** (shown, not ranked): P95 wait, energy per passenger, empty travel per passenger, decision energy. Decision energy is an estimate (see *Known limitations*), so it shows no interval and no leader.
 - **Overall** = average rank across the headline categories that have data for everyone, with equal weights and the formula printed on the page, alongside head-to-head W–L–T and how many leads are separable. It never replaces the categories.
 
 ## SLA lab
@@ -189,10 +189,10 @@ Still to explore: folding idle floor ranges in very tall towers, grouping many c
 | Leaderboard | Families from browser-stored records; unpaired t-intervals; equal-weight overall rank; any registered contestants, with a *Controlled only* filter. | Paired per-scenario analysis over a curated scenario catalog, contestant versions from a registry, configurable weights |
 | SLA lab | SLA versions in browser storage; per-run pass/fail with Wilson intervals over the recorded runs of one family. | SLAs in a shared registry, evaluated over the scenario catalog with paired and sequential testing |
 | Scenarios | A parametric generator (counts, window, intensity shape, direction mix, hotspot, heavy share, groups, three scripted events) validated only by eye. | Generators calibrated against measured building traffic, in a shared, versioned catalog |
-| Contestants | Twelve scripted policies in code; model "prompts", weights, locations and services are descriptive only, and no inference or network call runs. | A real registry: model endpoints or local weights, prompts and schemas under version control, algorithm packages with signed code hashes, and an adapter per contestant for the policy contract |
-| Max-speed wall-clock | Real: simulation time plus real model calls; algorithms don't add artificial waiting. | Measured compute time per decision on the engine's hardware |
+| Contestants | Four algorithms in `registry.js`, identified by a hash of their code; live models (local Laya, Jev, local fine-tunes) defined in the runner, pinned and checked on every answer. Adding one is a code change. | Registration from a manifest, without code changes; algorithm packages with signed code hashes |
+| Decision time | Measured for every decision, including algorithms (timed in the browser, at its timer's resolution). Algorithms still land instantly in the simulation: their compute time is far below one simulation step. | Measured compute time per decision on the engine's hardware |
 | Crowd dispatch | When more people wait at a landing than the assigned cars can carry, the policy is asked for a backup car ("CROWD"). Full cars skip hall calls (load bypass). | Real group-control strategies as contestant policies |
-| Decision energy | An estimate per contestant (about 0.0003 Wh per local Laya decision, effectively zero for algorithms). Remote models show "remote · n/a" and are left out of energy rankings. | Measured device power per decision for local models, marked as measured or estimated |
+| Decision energy | Not measured: a fixed per-decision figure for each contestant (0.0003 Wh per local Laya decision, 0.00001 Wh per algorithm decision) × its decisions. Shown as an estimate, never ranked. Remote models show "remote · n/a". | Measured device power per decision for local models, marked as measured or estimated |
 | Scoreboard and race | Metrics are computed from the simulated world, with no confidence intervals on a single run. Wait is measured from arrival to first boarding. | Metric definitions, repeated runs, confidence intervals, rankings, SLA evaluation |
 | Fallback | Runs on timeout, and on failure for live models, deciding instantly from the same observation. Benching after repeated failures is not implemented. | Fallback on timeout, failure or illegal choice, with benching after repeated failures |
 | Setup facets | Declared by hand in the registry. | Computed from manifests, resolved runtime identity and endpoint checks |

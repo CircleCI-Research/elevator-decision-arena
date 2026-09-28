@@ -193,7 +193,7 @@
     { label: 'Empty travel', v: (s) => s.emptyFloors, f: (s) => `${s.emptyFloors.toFixed(1)} fl`, better: 'low' },
     { group: 'Decision cost', note: 'scored separately' },
     { label: 'Decisions', v: (s) => s.decisions, f: (s) => String(s.decisions), better: null },
-    { label: 'Avg decision time', v: (s) => s.avgLatency, f: (s) => (s.avgLatency == null ? '—' : s.avgLatency < 1e-4 ? '< 0.1 ms' : `${Math.round(s.avgLatency * 1000)} ms`), better: 'low' },
+    { label: 'Avg decision time', v: (s) => s.decTime, f: (s) => (s.decTime == null ? '—' : EDA.util.decTime(s.decTime)), better: 'low' },
     {
       label: 'Decision energy',
       v: (s) => (s.remoteDecisions ? null : s.decisionWh), // remote inference can't be compared

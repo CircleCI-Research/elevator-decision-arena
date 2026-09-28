@@ -210,9 +210,8 @@
         name: 'Nearest-Car ETA',
         family: 'Nearest-Car ETA',
         version: 'v1.2.0',
-        identity: 'sha256 3f9a…c21e',
+        identity: 'plain ETA',
         description: 'Sends the car with the lowest estimated arrival time, counting distance, stops already planned and turning around.',
-        source: 'algorithms/nearest-car-eta.js',
         salt: 0x0b0b,
         decisionWh: 0.00001, // a few comparisons on a CPU
         params: {},

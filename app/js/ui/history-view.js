@@ -52,7 +52,7 @@
     ['Recovered (regen)', (r) => wh(r.regenWh)],
     ['Empty travel', (r) => `${r.emptyFloors.toFixed(0)} fl`],
     ['Decisions', (r) => String(r.decisions)],
-    ['Avg decision time', (r) => (r.avgLatency == null ? '—' : r.avgLatency < 1e-4 ? '< 0.1 ms' : `${Math.round(r.avgLatency * 1000)} ms`)],
+    ['Avg decision time', (r) => EDA.util.decTime(r.decTime)],
     ['Decision energy', (r) => (r.remoteDecisions ? 'remote · n/a' : r.decisionWh < 0.01 ? '< 0.01 Wh' : r.decisionWh < 1 ? `${r.decisionWh.toFixed(2)} Wh est.` : `${r.decisionWh.toFixed(1)} Wh est.`)],
     ['Safety vetoes', (r) => String(r.vetoes)],
     ['Fallback decisions', (r) => (r.fallbacks ? `${r.fallbacks} · ${Math.round((r.fallbacks / Math.max(1, r.decisions)) * 100)}%` : '0')],
@@ -73,7 +73,7 @@
     ['Recovered (regen)', (r) => r.regenWh, 'wh', 'high'],
     ['Empty travel', (r) => r.emptyFloors, 'fl', 'low'],
     ['Decisions', (r) => r.decisions, 'count', null],
-    ['Avg decision time', (r) => r.avgLatency, 'ms', 'low'],
+    ['Avg decision time', (r) => r.decTime ?? null, 'ms', 'low'],
     ['Decision energy', (r) => (r.remoteDecisions ? null : r.decisionWh), 'wh', 'low'],
     ['Safety vetoes', (r) => r.vetoes, 'count', 'low'],
     ['Fallback decisions', (r) => r.fallbacks ?? 0, 'count', 'low'],
@@ -91,7 +91,7 @@
       case 'fl':
         return `${v.toFixed(0)} fl`;
       case 'ms':
-        return v < 1e-4 ? '< 0.1 ms' : `${Math.round(v * 1000)} ms`;
+        return EDA.util.decTime(v);
       case 'wall':
         return wallLabel(v);
       default:
@@ -111,7 +111,7 @@
       case 'fl':
         return `${sign}${a.toFixed(0)} fl`;
       case 'ms':
-        return `${sign}${Math.round(a * 1000)} ms`;
+        return a < 0.01 ? `${sign}${(a * 1000).toFixed(1)} ms` : `${sign}${Math.round(a * 1000)} ms`;
       case 'wall':
         return `${sign}${wallLabel(a)}`;
       default:

@@ -30,5 +30,5 @@ An SLA is an operational promise, such as *"p95 wait under 60 s, and nobody wait
 
 - **Write the SLA before running.** The point of read-only versions is that the threshold was chosen before the result was known.
 - **Use fault pairs.** Without failure-condition runs, the failure half of the SLA has no evidence.
-- **Decision time matters here.** A *measured* batch tests the real latency of each model against the decision-time clause. A *fixed* batch tests only decision quality.
+- **The decision-time clause uses the measured time**, under both fixed and measured timing. Runs recorded before real times were kept can't be judged on it, so they're left out of any SLA that has that clause, and the cell says how many. Rerun the batch, or use an SLA without that clause, to evaluate them.
 - **The numbers come from the simulated building.** The decisions are real, but thresholds tuned here are a starting point for a real building, not a guarantee.

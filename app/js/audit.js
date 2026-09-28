@@ -161,6 +161,7 @@
     constructor(base, log) {
       Object.assign(this, { id: base.id, name: base.name, kind: base.kind, version: base.version, identity: base.identity, salt: base.salt, decisionWh: base.decisionWh, limits: base.limits, fallback: base.fallback, cid: base.cid });
       this.base = base;
+      this.replay = true; // recorded decisions keep their recorded times
       this.log = log;
       this.i = 0;
       this.captured = []; // { rec, obs, match }

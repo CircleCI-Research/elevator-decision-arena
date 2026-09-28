@@ -21,7 +21,7 @@
       case 'pct':
         return `${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(1)}%`;
       case 'ms':
-        return v < 1e-4 ? '< 0.1 ms' : `${Math.round(v * 1000)} ms`;
+        return EDA.util.decTime(v);
       case 'wh':
         return v < 0.01 ? '< 0.01 Wh' : `${v.toFixed(v < 10 ? 2 : 1)} Wh`;
       case 'fl':
@@ -40,7 +40,7 @@
       case 'pct':
         return `± ${h.toFixed(1)} pt`;
       case 'ms':
-        return h < 1e-4 ? '' : `± ${Math.round(h * 1000)} ms`;
+        return h < 1e-4 ? '' : h < 0.01 ? `± ${(h * 1000).toFixed(1)} ms` : `± ${Math.round(h * 1000)} ms`;
       case 'wh':
         return h < 0.01 ? '' : `± ${h.toFixed(2)}`;
       case 'fl':
@@ -215,7 +215,9 @@
         body =
           cat.key === 'resilience'
             ? `<p class="lb-empty">No fault / no-fault pairs yet. Run a batch with <b>fault pairs</b> to measure how much each policy slows down when a car fails.</p>`
-            : '<p class="lb-empty">No data yet.</p>';
+            : cat.key === 'cost' && b.n
+              ? '<p class="lb-empty">Not measured in these runs: they were recorded before real decision times were kept. New runs record them.</p>'
+              : '<p class="lb-empty">No data yet.</p>';
       } else {
         // Shared axis across contestants: intervals if any, else means.
         const lo = Math.min(...withData.map((r) => r.s.lo ?? r.s.mean));
@@ -229,13 +231,13 @@
             const s = r.s;
             const lead = cat.leader === r.c.cid;
             const bar =
-              s.n === 0
+              s.n === 0 || cat.estimate
                 ? ''
                 : `<span class="lb-ci" style="left:${x(s.lo ?? s.mean)};width:calc(${x(s.hi ?? s.mean)} - ${x(s.lo ?? s.mean)})"></span><span class="lb-mean" style="left:${x(s.mean)}"></span>`;
             return `
               <div class="lb-row${lead ? ' lead' : ''}" style="${EDA.registry.mark(r.c).style}">
                 ${EDA.registry.badge(r.c)}
-                <span class="lb-val"><b>${fmt(s.mean, cat.fmt)}</b><small>${s.n > 1 ? fmtHalf(s.half, cat.fmt) : s.n === 1 ? 'n = 1' : 'no data'}</small></span>
+                <span class="lb-val"><b>${fmt(s.mean, cat.fmt)}</b><small>${s.n === 0 ? 'no data' : cat.estimate ? 'estimate' : s.n > 1 ? fmtHalf(s.half, cat.fmt) : 'n = 1'}</small></span>
                 <span class="lb-axis">${bar}</span>
               </div>`;
           })
@@ -243,6 +245,8 @@
       }
       const verdict = !cat.hasData
         ? ''
+        : cat.estimate
+          ? '<span class="lb-v">Estimate · not ranked</span>'
         : cat.leader === 'tie'
           ? '<span class="lb-v tie">Tied</span>'
           : cat.separable
@@ -252,7 +256,7 @@
       return `
         <article class="lb-card">
           <header><b>${cat.label}</b>${verdict}</header>
-          <p class="lb-desc">${esc(cat.desc)} · ${cat.better === 'low' ? 'lower is better' : 'higher is better'} · n = ${n}</p>
+          <p class="lb-desc">${esc(cat.desc)} · ${cat.better === 'low' ? 'lower is better' : 'higher is better'} · n = ${n}${cat.note ? ` · ${esc(cat.note)}` : ''}</p>
           ${body}
         </article>`;
     }

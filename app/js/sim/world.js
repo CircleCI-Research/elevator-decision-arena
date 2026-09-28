@@ -70,7 +70,7 @@
       }));
       this.halls = Array.from({ length: cfg.floors }, () => ({ up: newHall(), down: newHall() }));
       this.queues = Array.from({ length: cfg.floors }, () => []);
-      this.decisions = { active: null, queue: [], history: [], count: 0, latencySum: 0, lastLatency: 0, vetoes: 0, energyWh: 0, fallbacks: 0, apiTokens: 0, apiCostUsd: 0, drifted: 0 };
+      this.decisions = { active: null, queue: [], history: [], count: 0, latencySum: 0, lastLatency: 0, decided: 0, measuredSum: 0, lastMeasured: null, vetoes: 0, energyWh: 0, fallbacks: 0, apiTokens: 0, apiCostUsd: 0, drifted: 0 };
       this.waiting = false; // a live model's answer is out: the run holds this world
       this.boardSeq = 0; // boarding order, for who steps back out of an overloaded car
       this.stats = { delivered: 0, waits: [] };
@@ -362,7 +362,12 @@
           this.askLive(req, obs);
           continue; // lands later; D.active now holds the pending ask, or it already landed
         }
-        this.land(this.timed(this.policy.decide(req, obs, this.rng), req, obs), req, ++D.count, this.t);
+        // An algorithm answers at once in sim time (its compute time is far
+        // below one step); what it really took is measured and reported.
+        const t0 = performance.now();
+        const dec = this.policy.decide(req, obs, this.rng);
+        if (dec.measured == null && !this.policy.replay) dec.measured = Math.round((performance.now() - t0) * 1000) / 1e6;
+        this.land(this.timed(dec, req, obs), req, ++D.count, this.t);
       }
     }
 
@@ -374,8 +379,14 @@
       dec.commitT = startT + dec.latency;
       dec.outcome = 'pending';
       this.decisionLog.push(dec); // the run's only non-derivable input, kept for audit and replay
-      D.latencySum += dec.latency;
+      D.latencySum += dec.latency; // what the simulation charged (the fixed time, under fixed timing)
       D.lastLatency = dec.latency;
+      // What the contestant really took, only where it had a choice to make.
+      if (dec.options?.some((o) => !o.veto) ?? true) {
+        D.decided++;
+        D.measuredSum += dec.measured ?? dec.latency;
+        D.lastMeasured = dec.measured ?? dec.latency;
+      }
       D.energyWh += this.policy.decisionWh ?? 0;
       if (dec.live) {
         D.apiTokens += dec.live.tokens ?? 0;
@@ -956,7 +967,8 @@
         longest,
         waiting,
         decisions: D.count,
-        avgLatency: D.count ? D.latencySum / D.count : null,
+        avgLatency: D.count ? D.latencySum / D.count : null, // charged in the simulation
+        decTime: D.decided ? D.measuredSum / D.decided : null, // measured
         fallbacks: D.fallbacks,
         apiTokens: D.apiTokens,
         apiCostUsd: D.apiCostUsd,

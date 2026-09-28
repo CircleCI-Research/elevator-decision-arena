@@ -23,7 +23,7 @@
     finishedAt: { label: 'Time to clear the wave', unit: 'clock', get: (r) => r.finishedAt },
     energyPerPax: { label: 'Energy per passenger', unit: 'Wh', get: (r) => (r.delivered ? r.energyWh / r.delivered : null) },
     vetoes: { label: 'Safety vetoes per run', unit: 'count', get: (r) => r.vetoes },
-    decTime: { label: 'Avg decision time', unit: 'ms', get: (r) => (r.avgLatency == null ? null : r.avgLatency * 1000) },
+    decTime: { label: 'Avg decision time', unit: 'ms', get: (r) => (r.decTime == null ? null : r.decTime * 1000), measuredOnly: true },
   };
   const CONDITIONS = { both: 'Normal & failure', normal: 'Normal only', failure: 'Failure only' };
 
@@ -133,7 +133,7 @@
   function slaFamilyKey(r) {
     const e = ev(r);
     const tag = EDA.scenario.timingTag(r.def.timing);
-    return JSON.stringify([r.sim, r.def.scenarioKey ?? r.def.scenario, r.def.floors, r.def.cars, !!e.heavy, !!e.spike, ...(tag ? [tag] : [])]);
+    return JSON.stringify([EDA.history.simName(r.sim), r.def.scenarioKey ?? r.def.scenario, r.def.floors, r.def.cars, !!e.heavy, !!e.spike, ...(tag ? [tag] : [])]);
   }
 
   function familyLabel(r) {
@@ -177,21 +177,26 @@
         const laneIn = (r) => r.contestants.find((x) => x.id === c.id && x.version === c.version);
         const pool = runs.filter((r) => !!ev(r).fault === (cond === 'failure') && laneIn(r));
         const clauses = sla.clauses.map((cl, i) => ({ ...cl, i })).filter((cl) => applies(cl, cond));
-        const perRun = pool.map((r) => {
+        const all = pool.map((r) => {
           const res = r.results[laneIn(r).key];
           const checks = clauses.map((cl) => {
             const v = METRICS[cl.metric].get(res);
             return { i: cl.i, v, pass: v != null && v <= cl.max + 1e-9 };
           });
-          return { run: r, checks, pass: checks.every((x) => x.pass) };
+          // A clause on a value the run never measured can't be judged:
+          // leave that run out, rather than pass or fail it.
+          const unknown = checks.some((x, j) => x.v == null && METRICS[clauses[j].metric].measuredOnly);
+          return { run: r, checks, pass: checks.every((x) => x.pass), unknown };
         });
+        const perRun = all.filter((x) => !x.unknown);
         const k = perRun.filter((x) => x.pass).length;
         cells.push({
           c,
           cond,
-          n: pool.length,
+          n: perRun.length,
+          unmeasured: all.length - perRun.length,
           runs: perRun,
-          overall: verdict(k, pool.length, sla.target, sla.minRuns),
+          overall: verdict(k, perRun.length, sla.target, sla.minRuns),
           clauses: clauses.map((cl) => {
             const vals = perRun.map((x) => x.checks.find((y) => y.i === cl.i));
             const kk = vals.filter((x) => x.pass).length;

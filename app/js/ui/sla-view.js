@@ -243,6 +243,7 @@
                 <div class="sla-cell-top">${this.badge(v, sla)}</div>
                 <div class="sla-k"><b>${v.k}/${v.n}</b> runs met it · ${pct(v.rate)}${v.n ? ` <small>(95% CI ${pct(v.w.lo)}–${pct(v.w.hi)})</small>` : ''}</div>
                 ${bar}
+                ${cell.unmeasured ? `<small class="sla-sub">${cell.unmeasured} older run${cell.unmeasured === 1 ? '' : 's'} left out: decision time wasn't measured then</small>` : ''}
                 ${cell.weakest ? `<p class="sla-weak">${icon('alert')}Breaks first on <b>${esc(clauseText(cell.weakest))}</b> · ${cell.weakest.verdict.k}/${cell.weakest.verdict.n}</p>` : v.n ? `<p class="sla-weak ok">${icon('check')}Every clause held in every run</p>` : ''}
               </td>`;
           })

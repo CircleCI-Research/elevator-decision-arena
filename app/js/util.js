@@ -78,5 +78,14 @@ window.EDA = window.EDA || {};
     };
   }
 
-  EDA.util = { floorLabel, arrow, clock, secs, destColor, geometry, fnv, fnvInt };
+  // Measured decision time, in seconds. null: not measured (runs recorded
+  // under fixed timing before real times were kept).
+  function decTime(s) {
+    if (s == null || !isFinite(s)) return 'not measured';
+    if (s < 1e-4) return '< 0.1 ms';
+    if (s < 0.01) return `${(s * 1000).toFixed(1)} ms`;
+    return `${Math.round(s * 1000)} ms`;
+  }
+
+  EDA.util = { floorLabel, arrow, clock, secs, destColor, geometry, fnv, fnvInt, decTime };
 })(window.EDA);
