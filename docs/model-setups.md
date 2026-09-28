@@ -316,3 +316,21 @@ After an external review flagged that the encodings were chosen while watching t
 - **Unplanned observation:** on Morning Wave, round robin was level with Jev enc3 and with Nearest-Car on these seeds.
 - **Run statistics:** 180 runs, 5,151 Jev decisions, $0.104, 0 fallbacks, 0 drift. All 180 run files pass Audit.
 - **Details:** [confirmation/results.md](confirmation/results.md).
+
+## 22. Confirmation run 2: Laya claims and option order (2026-09-28)
+
+Pre-registered like run 1 ([confirmation/preregistration-2.md](confirmation/preregistration-2.md)): seeds 3001–3030; office Normal and Morning Wave plus the 12 × 3 down-peak building; nine hypotheses, Holm. The run also adds **shuffled encodings** (`enc1s`, `enc3s`, fine-tune `-shuffled` twins): the options appear in a request-seeded order, so option order becomes the only difference in a controlled comparison.
+
+- **All nine hypotheses were supported.**
+  - Zero-shot base Laya enc1 waits longer than round robin: +14.0 s, 29/30 seeds; +8.5 s, 30/30.
+  - The imitation fine-tune beats base Laya enc3: −10.6 s and −4.4 s.
+  - The fine-tune equals its teacher, Nearest-Car v1.3.0, within ±1.5 s.
+  - In the second building the fine-tune equals Nearest-Car v1.2.0.
+  - Jev enc3 with shuffled options equals enc3 with fixed ones.
+- **Corrected:** the exploratory "fine-tune beats v1.3.0 by 1.6 s in the second building" did not replicate. On fresh seeds all three scored 47.4 s.
+- **Option order** (`runner/tools/positions.ts`, exact, from replays):
+  - Jev on raw numbers leans towards the first option even when shuffled, by about 6 points, with no measurable effect on waiting.
+  - With the arrival estimate the lean is small.
+  - The imitation fine-tune shows none.
+- **Run statistics:** 420 runs, 21,124 live calls, Jev $0.21, 0 fallbacks, 0 drift. All run files pass Audit.
+- **Details:** [confirmation/results-2.md](confirmation/results-2.md).

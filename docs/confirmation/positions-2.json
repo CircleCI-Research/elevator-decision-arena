@@ -1,0 +1,142 @@
+{
+ "checked": 19144,
+ "mismatched": 0,
+ "lanes": {
+  "jev@enc1s|morning-wave": {
+   "n": 1036,
+   "pickA": 0.37741312741312744,
+   "ruleCarAtA": 0.31756756756756754,
+   "agreeWithRule": 0.6052123552123552,
+   "pickAWhenRuleNotA": 0.2376237623762376,
+   "pickLastWhenRuleNotLast": 0.15714285714285714
+  },
+  "jev@enc1s|normal": {
+   "n": 1231,
+   "pickA": 0.32656376929325753,
+   "ruleCarAtA": 0.2688870836718115,
+   "agreeWithRule": 0.5174654752233956,
+   "pickAWhenRuleNotA": 0.21777777777777776,
+   "pickLastWhenRuleNotLast": 0.15584415584415584
+  },
+  "jev@enc1|morning-wave": {
+   "n": 1040,
+   "pickA": 0.4115384615384615,
+   "ruleCarAtA": 0.2903846153846154,
+   "agreeWithRule": 0.5990384615384615,
+   "pickAWhenRuleNotA": 0.2682926829268293,
+   "pickLastWhenRuleNotLast": 0.16895604395604397
+  },
+  "jev@enc1|normal": {
+   "n": 1224,
+   "pickA": 0.33251633986928103,
+   "ruleCarAtA": 0.2099673202614379,
+   "agreeWithRule": 0.4869281045751634,
+   "pickAWhenRuleNotA": 0.24095139607032057,
+   "pickLastWhenRuleNotLast": 0.14176663031624864
+  },
+  "jev@enc3s|morning-wave": {
+   "n": 1043,
+   "pickA": 0.37679769894535,
+   "ruleCarAtA": 0.33940556088207097,
+   "agreeWithRule": 0.887823585810163,
+   "pickAWhenRuleNotA": 0.08708272859216255,
+   "pickLastWhenRuleNotLast": 0.042582417582417584
+  },
+  "jev@enc3s|normal": {
+   "n": 1239,
+   "pickA": 0.3018563357546408,
+   "ruleCarAtA": 0.27602905569007263,
+   "agreeWithRule": 0.8539144471347861,
+   "pickAWhenRuleNotA": 0.06354515050167224,
+   "pickLastWhenRuleNotLast": 0.03429796355841372
+  },
+  "jev@enc3|morning-wave": {
+   "n": 1037,
+   "pickA": 0.313404050144648,
+   "ruleCarAtA": 0.3105110896817743,
+   "agreeWithRule": 0.8997107039537127,
+   "pickAWhenRuleNotA": 0.04755244755244755,
+   "pickLastWhenRuleNotLast": 0.04929577464788732
+  },
+  "jev@enc3|normal": {
+   "n": 1234,
+   "pickA": 0.2755267423014587,
+   "ruleCarAtA": 0.2625607779578606,
+   "agreeWithRule": 0.853322528363047,
+   "pickAWhenRuleNotA": 0.06703296703296703,
+   "pickLastWhenRuleNotLast": 0.05200433369447454
+  },
+  "laya-ft@pilot-imitation-enc3-bd0835f-shuffled|morning-wave": {
+   "n": 1048,
+   "pickA": 0.36259541984732824,
+   "ruleCarAtA": 0.36259541984732824,
+   "agreeWithRule": 0.9064885496183206,
+   "pickAWhenRuleNotA": 0.04790419161676647,
+   "pickLastWhenRuleNotLast": 0.037333333333333336
+  },
+  "laya-ft@pilot-imitation-enc3-bd0835f-shuffled|normal": {
+   "n": 1244,
+   "pickA": 0.24839228295819935,
+   "ruleCarAtA": 0.27009646302250806,
+   "agreeWithRule": 0.8569131832797428,
+   "pickAWhenRuleNotA": 0.03634361233480176,
+   "pickLastWhenRuleNotLast": 0.05460385438972163
+  },
+  "laya-ft@pilot-imitation-enc3-bd0835f|12x3-down-peak": {
+   "n": 965,
+   "pickA": 0.36683937823834195,
+   "ruleCarAtA": 0.39378238341968913,
+   "agreeWithRule": 0.8435233160621761,
+   "pickAWhenRuleNotA": 0.0735042735042735,
+   "pickLastWhenRuleNotLast": 0.08580343213728549
+  },
+  "laya-ft@pilot-imitation-enc3-bd0835f|morning-wave": {
+   "n": 1052,
+   "pickA": 0.3108365019011407,
+   "ruleCarAtA": 0.30798479087452474,
+   "agreeWithRule": 0.9106463878326996,
+   "pickAWhenRuleNotA": 0.04120879120879121,
+   "pickLastWhenRuleNotLast": 0.04401650618982118
+  },
+  "laya-ft@pilot-imitation-enc3-bd0835f|normal": {
+   "n": 1233,
+   "pickA": 0.26034063260340634,
+   "ruleCarAtA": 0.2871046228710462,
+   "agreeWithRule": 0.8483373884833739,
+   "pickAWhenRuleNotA": 0.040955631399317405,
+   "pickLastWhenRuleNotLast": 0.051961823966065745
+  },
+  "laya-local@enc1|morning-wave": {
+   "n": 986,
+   "pickA": 0.4056795131845842,
+   "ruleCarAtA": 0.372210953346856,
+   "agreeWithRule": 0.39655172413793105,
+   "pickAWhenRuleNotA": 0.35379644588045234,
+   "pickLastWhenRuleNotLast": 0.2612732095490716
+  },
+  "laya-local@enc1|normal": {
+   "n": 1253,
+   "pickA": 0.3559457302474062,
+   "ruleCarAtA": 0.11971268954509177,
+   "agreeWithRule": 0.18675179569034317,
+   "pickAWhenRuleNotA": 0.3445149592021759,
+   "pickLastWhenRuleNotLast": 0.1674364896073903
+  },
+  "laya-local@enc3|morning-wave": {
+   "n": 1065,
+   "pickA": 0.24976525821596243,
+   "ruleCarAtA": 0.3812206572769953,
+   "agreeWithRule": 0.2291079812206573,
+   "pickAWhenRuleNotA": 0.26403641881638845,
+   "pickLastWhenRuleNotLast": 0.3474240422721268
+  },
+  "laya-local@enc3|normal": {
+   "n": 1214,
+   "pickA": 0.2586490939044481,
+   "ruleCarAtA": 0.21252059308072488,
+   "agreeWithRule": 0.1515650741350906,
+   "pickAWhenRuleNotA": 0.26464435146443516,
+   "pickLastWhenRuleNotLast": 0.16251830161054173
+  }
+ }
+}
