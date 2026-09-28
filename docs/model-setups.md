@@ -304,3 +304,15 @@ As expected, imitation reaches its teacher and doesn't pass it. Next: hindsight 
   - **The office imitation fine-tune transfers:** 47.7 s, tied with Jev and Nearest-Car v1.2.0, and separably better than v1.3.0 (−1.6 s).
   - **A per-building hindsight fine-tune** (2,109 samples) **collapsed**: a near-uniform output with a positional lean, "always car A" on 200/200 held-out decisions, 84.8 s average wait.
   - **Lessons:** shuffle option order, check prediction distributions rather than accuracy, keep the best epoch, validate by racing.
+
+## 21. Confirmation run 1: pre-registered, fresh seeds (2026-09-28)
+
+After an external review flagged that the encodings were chosen while watching the evaluation seeds, the headline Jev claims were re-tested. The design was frozen and pre-registered first ([confirmation/preregistration.md](confirmation/preregistration.md)): seeds 2001–2030, never used; 24 × 4; Normal and Morning Wave; fixed 0.25 s; four primary hypotheses with Holm correction. The tool is `runner/tools/confirm.ts`, headless through the runner.
+
+- **All four hypotheses were supported.**
+  - Jev enc3 waits less than enc1: −3.2 s [−4.7, −1.8] and −4.0 s [−5.3, −2.7].
+  - Jev enc3 is equivalent to Nearest-Car ETA v1.2.0 within ±1.5 s: −0.5 s [−1.5, +0.5] and −0.8 s [−1.5, −0.0] (TOST, Holm p = 0.037).
+- **The encoding effect shrank** from the exploratory −5.5 / −4.7 s, as expected after selection.
+- **Unplanned observation:** on Morning Wave, round robin was level with Jev enc3 and with Nearest-Car on these seeds.
+- **Run statistics:** 180 runs, 5,151 Jev decisions, $0.104, 0 fallbacks, 0 drift. All 180 run files pass Audit.
+- **Details:** [confirmation/results.md](confirmation/results.md).
