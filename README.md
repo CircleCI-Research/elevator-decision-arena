@@ -1,6 +1,6 @@
 # Elevator Decision Arena
 
-**A benchmark for decision models on a real problem: elevator dispatch.**
+**A reproducible, simulation-based benchmark of decision models and dispatch algorithms on one everyday decision: which elevator car answers a call.**
 
 Every time someone presses a hall button, a building has to decide which car answers. Elevator Decision Arena (EDA) races two contestants on that decision, side by side, under identical conditions: the same building, passengers, seed and events. The contestants can be decision models (such as TypeSafe's **Jev** or Convai's **Laya**, both "System One" models that answer typed questions with calibrated probabilities) or classic dispatch algorithms. It measures who serves passengers best, and whether the comparison is fair.
 
@@ -119,18 +119,19 @@ Step-by-step guides for every menu section, batching, new scenarios and new benc
 
 ## Results so far (simulated building, eda-sim 0.2)
 
-24 floors × 4 cars, the same 10 seeds for every contestant, fixed decision time, mean average wait (Normal traffic / Morning Wave). Differences were tested seed by seed (paired) from the exported run records:
+24 floors × 4 cars, the same 10 seeds for every contestant, fixed decision time, mean average wait (Normal traffic / Morning Wave). Differences were tested seed by seed (paired, 95% intervals, not adjusted for multiple comparisons) from the exported run records. These results are **exploratory**: the encodings were chosen while watching these same seeds, and options were always listed in the same order.
 
 | Contestant | Average wait |
 |---|---|
-| Nearest-Car ETA (classic heuristic) | **30.6 s / 42.9 s** |
+| Nearest-Car ETA v1.2.0 (classic heuristic) | **30.6 s / 43.0 s** |
+| Nearest-Car ETA v1.3.0 (load-aware) | 31.0 s / 42.9 s |
 | Jev, given a per-car arrival estimate (encoding 3) | 31.1 s / 43.6 s |
 | Round robin | 33.4 s / 44.9 s |
 | Jev on raw numbers (encoding 1) | 36.5 s / 48.3 s |
-| Base Laya, arrival estimate (encoding 3) | 40.3 s / 50.7 s |
-| Base Laya on raw numbers (encoding 1) | 52.2 s / 51.3 s |
+| Base Laya, zero-shot, arrival estimate (encoding 3) | 40.3 s / 50.7 s |
+| Base Laya, zero-shot, raw numbers (encoding 1) | 52.2 s / 51.3 s |
 
-In short: framing the question (doing the arithmetic in the encoding) brings Jev up to the classic heuristic, and base Laya needs fine-tuning. Details and caveats are in [docs/model-setups.md](docs/model-setups.md) §15–18.
+In short: handing Jev an arrival estimate (the heuristic's own formula, computed in the encoding) brought it within a second of the heuristic, too close for ten seeds to call. Base Laya, used zero-shot in our format, needs fine-tuning. Scope: rankings inside this simulated building, for the setups tested. Details and caveats are in [docs/model-setups.md](docs/model-setups.md) §15–18.
 
 ## Tests
 
