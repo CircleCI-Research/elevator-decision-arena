@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Elevator Decision Arena</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Icon sprite -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><rect x="6.5" y="5" width="4" height="14" rx="1.2" fill="currentColor" stroke="none"/><rect x="13.5" y="5" width="4" height="14" rx="1.2" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-step" viewBox="0 0 24 24"><path d="M5.5 5.5v13l8.5-6.5z" fill="currentColor" stroke="none"/><rect x="16" y="5.5" width="2.8" height="13" rx="1.2" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-restart" viewBox="0 0 24 24"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"/><path d="M4.5 4.5v4h4"/></symbol>
+    <symbol id="i-theme" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></symbol>
+    <symbol id="i-weight" viewBox="0 0 24 24"><path d="M6.5 9h11l2 10.5h-15z"/><circle cx="12" cy="6" r="2.2"/></symbol>
+    <symbol id="i-wrench" viewBox="0 0 24 24"><path d="M14.5 5.5a4 4 0 0 0-5 5L4.5 15.5l4 4 5-5a4 4 0 0 0 5-5l-2.5 2.5-2.5-.5-.5-2.5z"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 4 21 19.5H3z"/><path d="M12 10v4"/><circle cx="12" cy="16.8" r=".7" fill="currentColor"/></symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3 5.5 13.5H11L10 21l8-11h-5.5z"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3.5 19c.6-3.3 2.8-5 5.5-5s4.9 1.7 5.5 5"/><circle cx="17" cy="9" r="2.3"/><path d="M16 14.2c2.3.1 3.9 1.6 4.5 4.3"/></symbol>
+    <symbol id="i-flag" viewBox="0 0 24 24"><path d="M6 21V4"/><path d="M6 4.5h11l-2.5 4 2.5 4H6"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5.5" y="10.5" width="13" height="9.5" rx="2"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 7.5V12l3 2"/></symbol>
+    <symbol id="i-dot" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-hold" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="16" rx="2"/><path d="M12 4v16M9.5 12H7M14.5 12H17"/></symbol>
+    <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></symbol>
+    <symbol id="i-shuffle" viewBox="0 0 24 24"><path d="M4 7h3.5c2.5 0 3.5 1.2 5 5s2.5 5 5 5H20"/><path d="M4 17h3.5c1.3 0 2.2-.4 3-1.3M13.5 8.3c.8-.9 1.7-1.3 3-1.3H20"/><path d="m17.5 4.5 2.5 2.5-2.5 2.5M17.5 14.5l2.5 2.5-2.5 2.5"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+    <symbol id="i-building" viewBox="0 0 24 24"><rect x="4" y="3.5" width="16" height="17" rx="2"/><path d="M9 20.5v-5h6v5M8 8h2M14 8h2M8 11.5h2M14 11.5h2"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1" fill="currentColor"/><circle cx="4.5" cy="12" r="1" fill="currentColor"/><circle cx="4.5" cy="18" r="1" fill="currentColor"/></symbol>
+    <symbol id="i-chip" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M10 10h4v4h-4zM9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3"/></symbol>
+    <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8.5 20h7M10 17h4"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r=".8" fill="currentColor"/></symbol>
+    <symbol id="i-history" viewBox="0 0 24 24"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"/><path d="M4.5 4.5v4h4M12 8v4l2.5 2"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3.5 19 6v5.5c0 4.2-3 7.6-7 9-4-1.4-7-4.8-7-9V6z"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11M7 10.5l5 5 5-5M5 19.5h14"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 15.5v-11M7 9l5-5 5 5M5 19.5h14"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-sidebar" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><path d="M9.5 4.5v15M16 10l-2 2 2 2"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5"/><circle cx="12" cy="8" r=".7" fill="currentColor"/></symbol>
+  </svg>
+
+  <div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Main navigation">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 40 40" aria-hidden="true">
+        <rect x="3" y="6" width="34" height="31" rx="5" class="logo-shell"/>
+        <rect x="9" y="12" width="9" height="19" rx="2" class="logo-a"/>
+        <rect x="22" y="18" width="9" height="13" rx="2" class="logo-b"/>
+        <rect x="3" y="31" width="34" height="6" rx="2" class="logo-base"/>
+      </svg>
+      <div class="brand-text"><span class="proto-chip">Phase 1 prototype</span></div>
+      <button class="ctl sb-close" id="btn-close-menu" aria-label="Close navigation"><svg class="ico"><use href="#i-close"/></svg></button>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-group">
+        <span class="card-k">Compete</span>
+        <a class="nav-item" href="#" data-page="arena" aria-current="page"><svg class="ico"><use href="#i-building"/></svg><span class="nav-label">Arena</span><span class="nav-badge live">Live</span></a>
+        <div class="run-sub" aria-label="Runs in this session">
+          <button class="run-new" data-new-exp><svg class="ico"><use href="#i-plus"/></svg><span class="nav-label">New experiment</span></button>
+          <div class="run-head">
+            <button class="run-toggle" id="run-toggle" aria-expanded="true" aria-controls="run-body">
+              <svg class="ico" aria-hidden="true"><use href="#i-arrow"/></svg>Session <span class="run-count" id="run-count"></span>
+            </button>
+            <div class="chips mini" role="group" aria-label="Filter session runs">
+              <button data-runfilter="all" class="on">All</button><button data-runfilter="live" id="run-live">Live</button>
+            </div>
+          </div>
+          <div id="run-body">
+            <div id="run-list" class="run-scroll"></div>
+            <a class="run-more" id="run-more" href="#">View all in Run history →</a>
+          </div>
+        </div>
+        <a class="nav-item" href="#" data-page="scenarios"><svg class="ico"><use href="#i-list"/></svg><span class="nav-label">Scenarios</span></a>
+        <a class="nav-item" href="#" data-page="contestants"><svg class="ico"><use href="#i-chip"/></svg><span class="nav-label">Contestants</span></a>
+      </div>
+      <div class="nav-group">
+        <span class="card-k">Evaluate</span>
+        <a class="nav-item" href="#" data-page="leaderboard"><svg class="ico"><use href="#i-trophy"/></svg><span class="nav-label">Leaderboard</span></a>
+        <a class="nav-item" href="#" data-page="sla"><svg class="ico"><use href="#i-target"/></svg><span class="nav-label">SLA lab</span></a>
+        <a class="nav-item" href="#" data-page="history"><svg class="ico"><use href="#i-history"/></svg><span class="nav-label">Run history</span><span class="nav-badge count" id="history-count"></span></a>
+      </div>
+      <div class="nav-group">
+        <span class="card-k">Trust</span>
+        <a class="nav-item" href="#" data-page="audit"><svg class="ico"><use href="#i-shield"/></svg><span class="nav-label">Audit &amp; replay</span></a>
+      </div>
+    </nav>
+
+    <div class="sb-foot" id="sb-foot">Simulated building and traffic. Decisions come from real algorithms; live models (Laya, Jev) join when this page is served by the arena runner.</div>
+    <button class="nav-item sb-collapse" id="btn-collapse" aria-pressed="false" title="Collapse sidebar ([)"><svg class="ico"><use href="#i-sidebar"/></svg><span class="nav-label">Collapse sidebar</span></button>
+  </aside>
+  <div class="scrim" id="scrim"></div>
+
+  <div class="app">
+    <header class="top">
+      <div class="top-id">
+        <button id="btn-menu" class="ctl menu-btn" aria-label="Open navigation" aria-controls="sidebar" aria-expanded="false"><svg class="ico"><use href="#i-menu"/></svg></button>
+        <div class="identity">
+          <h1>Elevator Decision Arena</h1>
+          <p class="tagline">AI decision models and classic algorithms dispatch the same elevator traffic, side by side, so you can see who serves passengers best and why.</p>
+        </div>
+      </div>
+
+      <div class="round">
+        <div class="round-k"><span id="run-title">Run 1 · Morning Wave</span> <span class="seed-chip" id="seed" tabindex="0"></span></div>
+        <div class="round-meta" id="meta"></div>
+      </div>
+
+      <div class="clock-wrap">
+        <div class="clock" id="clock">00:00.0</div>
+        <div class="paused-flag">PAUSED</div>
+      </div>
+
+      <div class="controls">
+        <button id="btn-play" class="ctl primary" aria-label="Pause" title="Play / pause (Space)"></button>
+        <button id="btn-step" class="ctl" aria-label="Step half a second" title="Step 0.5 s (→)"><svg class="ico"><use href="#i-step"/></svg></button>
+        <div class="seg" id="speed" role="group" aria-label="Speed">
+          <button data-speed="1" title="1× (1)">1×</button><button data-speed="2" title="2× (2)">2×</button><button data-speed="4" title="4× (4)">4×</button><button data-speed="16" title="16×">16×</button>
+        </div>
+        <button id="btn-restart" class="ctl" aria-label="Rerun with the same settings" title="Rerun with the same settings as a new run (R)"><svg class="ico"><use href="#i-restart"/></svg></button>
+        <button id="btn-theme" class="ctl ghost" aria-label="Theme" title="Theme"><svg class="ico"><use href="#i-theme"/></svg></button>
+      </div>
+    </header>
+
+    <section class="hx card" id="view-history" aria-label="Run history" hidden></section>
+    <section class="au" id="view-audit" aria-label="Audit and replay" hidden></section>
+    <section class="hx card lb" id="view-leaderboard" aria-label="Leaderboard" hidden></section>
+    <section class="hx card lb sla" id="view-sla" aria-label="SLA lab" hidden></section>
+    <section class="hx card lb scn" id="view-scenarios" aria-label="Scenarios" hidden></section>
+    <section class="hx card lb cst" id="view-contestants" aria-label="Contestants" hidden></section>
+
+    <section class="timeline card arena-only" id="timeline" aria-label="Scenario timeline"></section>
+
+    <main class="arena arena-only">
+      <section class="side" aria-label="Contestant A">
+        <div class="bldg-wrap" id="bldg-A"></div>
+        <div id="dp-A"></div>
+      </section>
+
+      <aside class="center">
+        <div class="card race" id="race"></div>
+        <div class="card score" id="score"></div>
+        <div class="card experiment">
+          <div class="card-h"><span class="card-k">Experiment</span><span class="lock-chip"><svg class="ico"><use href="#i-lock"/></svg>Fixed for this run</span></div>
+          <dl class="exp-def" id="exp-def"></dl>
+          <div class="setup-run">
+            <span class="setup-k">Run mode</span>
+            <div class="seg small" role="group" aria-label="Run mode">
+              <button data-run="timeline">Timeline</button><button data-run="fast">Max speed</button>
+            </div>
+          </div>
+          <div class="setup-detail" id="set-run-note"></div>
+          <button class="btn-new wide" data-new-exp><svg class="ico"><use href="#i-plus"/></svg>New experiment</button>
+        </div>
+        <div class="card incidents" id="incidents"></div>
+        <div class="card feed" id="feed"></div>
+      </aside>
+
+      <section class="side" aria-label="Contestant B">
+        <div class="bldg-wrap" id="bldg-B"></div>
+        <div id="dp-B"></div>
+      </section>
+    </main>
+
+    <section class="card legend arena-only" aria-label="Legend">
+      <div class="lg-group">
+        <span class="card-k">Destination</span>
+        <span class="lg-dests" id="lg-dests"></span>
+      </div>
+      <div class="lg-group">
+        <span class="card-k">Car</span>
+        <span class="lg-states">
+          <b class="s-idle">Idle</b><b class="s-moving">Moving</b><b class="s-open">Doors open</b><b class="s-overload">Overloaded</b><b class="s-fault">Fault</b><b class="s-out">Out of service</b>
+        </span>
+      </div>
+      <div class="lg-group">
+        <span class="card-k">Hall button</span>
+        <span class="lg-btns">
+          <span><i class="lg-tri"></i>idle</span>
+          <span><i class="lg-tri lit"></i>called</span>
+          <span><i class="lg-spin"></i>policy deciding</span>
+          <span><i class="lg-chip">2</i>assigned car</span>
+          <span><b class="lg-dup">×3</b>repeat presses</span>
+          <span><i class="lg-imp">!</i>waiting &gt; 30 s</span>
+        </span>
+      </div>
+      <div class="lg-group keys">
+        <span class="card-k">Keys</span>
+        <span><kbd>Space</kbd> play <kbd>→</kbd> step <kbd>1</kbd><kbd>2</kbd><kbd>4</kbd> speed <kbd>M</kbd> run mode <kbd>N</kbd> new experiment <kbd>R</kbd> rerun <kbd>H</kbd> history <kbd>A</kbd> audit <kbd>L</kbd> leaderboard <kbd>S</kbd> SLA lab <kbd>C</kbd> scenarios <kbd>P</kbd> contestants</span>
+      </div>
+    </section>
+
+    <footer class="foot" id="page-foot">
+      Prototype. The building, its traffic and physics are simulated. Decisions come from real algorithms and, through the arena runner, real models. Results are rankings within this simulation, not of real buildings.
+    </footer>
+  </div>
+
+  </div>
+
+  <dialog class="exp-dialog" id="new-exp" aria-labelledby="nx-title">
+    <form method="dialog">
+      <header class="nx-head">
+        <h2 id="nx-title">New experiment</h2>
+        <p>Everything here is fixed once the run starts, so its results stay comparable and replicable. Only the run mode can change while it runs.</p>
+      </header>
+
+      <section class="nx-sec">
+        <h3>Building</h3>
+        <div class="nx-row">
+          <span>Floors</span>
+          <div class="stepper"><button type="button" data-step="floors:-1" aria-label="Fewer floors">−</button><output id="nx-floors">6</output><button type="button" data-step="floors:1" aria-label="More floors">+</button></div>
+        </div>
+        <div class="nx-row">
+          <span>Cars</span>
+          <div class="stepper"><button type="button" data-step="cars:-1" aria-label="Fewer cars">−</button><output id="nx-cars">3</output><button type="button" data-step="cars:1" aria-label="More cars">+</button></div>
+        </div>
+        <div class="presets">
+          <button type="button" data-preset="low">Low-rise<small>6 × 3</small></button>
+          <button type="button" data-preset="mid">Mid-rise<small>12 × 4</small></button>
+          <button type="button" data-preset="tower">Tower<small>24 × 6</small></button>
+          <button type="button" data-preset="sky">Skyscraper<small>60 × 10 · stats</small></button>
+          <button type="button" data-preset="mega">Megatall<small>120 × 16 · stats</small></button>
+        </div>
+        <p class="nx-note" id="nx-drawing"></p>
+      </section>
+
+      <section class="nx-sec">
+        <h3>Scenario</h3>
+        <div class="nx-row">
+          <label for="nx-scenario">Traffic</label>
+          <select id="nx-scenario"></select>
+        </div>
+        <p class="nx-note" id="nx-scenario-desc"></p>
+        <div class="nx-row">
+          <label for="nx-seed">Seed</label>
+          <span class="nx-seed"><input id="nx-seed" type="number" min="0" step="1" inputmode="numeric"><button type="button" id="nx-seed-random">Random</button></span>
+        </div>
+        <fieldset class="nx-events">
+          <legend>Scripted events</legend>
+          <label><input type="checkbox" id="nx-ev-heavy"> <span id="nx-ev-heavy-t"></span></label>
+          <label><input type="checkbox" id="nx-ev-fault"> <span id="nx-ev-fault-t"></span></label>
+          <label><input type="checkbox" id="nx-ev-spike"> <span id="nx-ev-spike-t"></span></label>
+          <p class="nx-note" id="nx-fault-note">Single-car buildings skip the fault: there is no car to fail over to.</p>
+        </fieldset>
+      </section>
+
+      <section class="nx-sec">
+        <h3>Contestants</h3>
+        <div class="nx-lanes">
+          <label class="nx-lane"><span class="lane lane-A">A</span><select id="nx-lane-A" aria-label="Lane A contestant"></select></label>
+          <button type="button" class="nx-swap" id="nx-lane-swap" aria-label="Swap lanes" title="Swap lanes"><svg class="ico"><use href="#i-shuffle"/></svg></button>
+          <label class="nx-lane"><span class="lane lane-B">B</span><select id="nx-lane-B" aria-label="Lane B contestant"></select></label>
+          <p class="nx-note nx-lane-d" id="nx-lane-A-d"></p>
+          <span></span>
+          <p class="nx-note nx-lane-d" id="nx-lane-B-d"></p>
+        </div>
+        <p class="nx-note nx-lane-note" id="nx-lane-note"></p>
+        <div class="nx-row">
+          <label for="nx-timing">Decision time</label>
+          <select id="nx-timing">
+            <option value="measured">Measured · realistic</option>
+            <option value="fixed">Fixed 0.25 s · quality only</option>
+          </select>
+        </div>
+        <div class="nx-row">
+          <label for="nx-timeout">Timeout</label>
+          <select id="nx-timeout">
+            <option value="own">Each contestant's own</option>
+            <option value="1.5">Shared · 1.5 s</option>
+            <option value="0.5">Shared · 0.5 s</option>
+          </select>
+        </div>
+        <p class="nx-note" id="nx-timing-note"></p>
+        <div class="nx-setup" id="nx-setup" aria-live="polite"></div>
+      </section>
+
+      <section class="nx-sec">
+        <h3>Repetitions</h3>
+        <div class="nx-row">
+          <label for="nx-reps">Seeds</label>
+          <select id="nx-reps">
+            <option value="1">1 · single run</option>
+            <option value="5">5 · batch</option>
+            <option value="10">10 · batch</option>
+            <option value="20">20 · batch</option>
+          </select>
+        </div>
+        <label class="nx-check"><input type="checkbox" id="nx-pairs"> Fault pairs <small>run each seed with and without the car fault, to measure resilience</small></label>
+        <p class="nx-note" id="nx-reps-note"></p>
+      </section>
+
+      <section class="nx-sec">
+        <h3>Start in</h3>
+        <div class="seg small" role="group" aria-label="Initial run mode">
+          <button type="button" data-nx-mode="timeline">Timeline</button><button type="button" data-nx-mode="fast">Max speed</button>
+        </div>
+      </section>
+
+      <footer class="nx-foot">
+        <button type="button" class="btn-ghost" id="nx-cancel">Cancel</button>
+        <button class="btn-new" id="nx-launch"><svg class="ico"><use href="#i-play"/></svg>Launch run</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="js/util.js"></script>
+  <script src="js/sim/scenario.js"></script>
+  <script src="js/sim/world.js"></script>
+  <script src="js/sim/registry.js"></script>
+  <script src="js/setup.js"></script>
+  <script src="js/live.js"></script>
+  <script src="js/scenario-store.js"></script>
+  <script src="js/ui/building-view.js"></script>
+  <script src="js/ui/stats-view.js"></script>
+  <script src="js/history-store.js"></script>
+  <script src="js/ui/history-view.js"></script>
+  <script src="js/audit.js"></script>
+  <script src="js/ui/audit-view.js"></script>
+  <script src="js/leaderboard.js"></script>
+  <script src="js/ui/leaderboard-view.js"></script>
+  <script src="js/sla.js"></script>
+  <script src="js/ui/sla-view.js"></script>
+  <script src="js/ui/scenarios-view.js"></script>
+  <script src="js/ui/contestants-view.js"></script>
+  <script src="js/ui/setup-view.js"></script>
+  <script src="js/ui/decision-panel.js"></script>
+  <script src="js/ui/hud.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+.DS_Store
+*.log
+node_modules/
+
+# Local model runtimes (virtualenvs, caches)
+runtime/*/.venv/
+
+# Working notes for articles: kept local, never committed
+docs/findings/
+# Generated fine-tuning data and checkpoints (reproducible, large)
+runtime/*/data/
+runtime/*/checkpoints/

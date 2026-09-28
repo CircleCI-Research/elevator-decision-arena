@@ -1,0 +1,19 @@
+{
+  "model": "jev-1.13.0",
+  "state": {
+    "request": {"kind": "assign", "floor": 7, "dir": "up", "reason": "new", "t_s": 132.4},
+    "building": {"floors": 24, "cars": 4, "capacity_kg": 630}
+  },
+  "questions": {
+    "car": {
+      "type": "choice",
+      "instructions": "Which car should answer this hall call? Prefer the car that will reach the calling floor soonest and can still take passengers.",
+      "criteria": {
+        "A": "floor 3.2, moving up, doors closed, 150 of 630 kg, 2 stops, 1 call",
+        "B": "floor 12.0, idle, doors open, 0 of 630 kg, 0 stops, 0 calls",
+        "C": "floor 6.0, moving up, doors closed, 610 of 630 kg, 1 stop, 0 calls",
+        "D": "out of service"
+      }
+    }
+  }
+}
