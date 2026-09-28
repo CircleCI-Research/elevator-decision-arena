@@ -119,7 +119,7 @@ Step-by-step guides for every menu section, batching, new scenarios and new benc
 
 ## Results so far (simulated building, eda-sim 0.2)
 
-24 floors × 4 cars, the same 10 seeds for every contestant, fixed decision time, mean average wait (Normal traffic / Morning Wave). Differences were tested seed by seed (paired, 95% intervals, not adjusted for multiple comparisons) from the exported run records. These results are **exploratory**: the encodings were chosen while watching these same seeds, and options were always listed in the same order.
+24 floors × 4 cars, the same 10 seeds for every contestant, fixed decision time, mean average wait (Normal traffic / Morning Wave). Differences were tested seed by seed (paired, 95% intervals, not adjusted for multiple comparisons) from the exported run records. These results are **exploratory**: the encodings were chosen while watching these same seeds, and options were always listed in the same order. The Jev claims were then confirmed on fresh seeds (below).
 
 | Contestant | Average wait |
 |---|---|
@@ -130,6 +130,8 @@ Step-by-step guides for every menu section, batching, new scenarios and new benc
 | Jev on raw numbers (encoding 1) | 36.5 s / 48.3 s |
 | Base Laya, zero-shot, arrival estimate (encoding 3) | 40.3 s / 50.7 s |
 | Base Laya, zero-shot, raw numbers (encoding 1) | 52.2 s / 51.3 s |
+
+**Confirmed on fresh seeds.** A pre-registered confirmation run (seeds 2001–2030, never used before; four hypotheses, Holm-corrected) supported both Jev claims. The arrival estimate cut Jev's wait by 3.2 s / 4.0 s (smaller than above, as expected after selection), and with it Jev was equivalent to Nearest-Car ETA v1.2.0 within ±1.5 s. It took 180 runs, all verified by Audit, and cost $0.10. On those seeds round robin was level with both in the Morning Wave. See [docs/confirmation/results.md](docs/confirmation/results.md).
 
 In short: handing Jev an arrival estimate (the heuristic's own formula, computed in the encoding) brought it within a second of the heuristic, too close for ten seeds to call. Base Laya, used zero-shot in our format, needs fine-tuning. Scope: rankings inside this simulated building, for the setups tested. Details and caveats are in [docs/model-setups.md](docs/model-setups.md) §15–18.
 
