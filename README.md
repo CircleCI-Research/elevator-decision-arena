@@ -99,6 +99,8 @@ Open the app **from the runner's address**. Opened any other way, it has only th
 3. Choose **Seeds: 10** for a batch. It runs at max speed and feeds the Leaderboard.
 4. Read the results in **Leaderboard** (turn on *Controlled only*), **Run history** (compare two runs) and **Audit & replay** (every decision, with the exact model request and response).
 
+Step-by-step guides for every menu section, batching, new scenarios and new benchmarks are in [docs/HOW-TO/](docs/HOW-TO/README.md).
+
 ## Repository
 
 | Path | What |
@@ -106,7 +108,7 @@ Open the app **from the runner's address**. Opened any other way, it has only th
 | `app/` | The app: vanilla JS, SVG, no build step. `js/sim/` holds the simulator (`world.js`), traffic scenarios (`scenario.js`) and the contestant registry (`registry.js`). See [app/README.md](app/README.md) for every page and control. |
 | `runner/` | Local server (TypeScript, Node): serves the app, holds the keys, encodes decisions and calls the models. Loopback and same-origin only. `tools/export-dataset.ts` exports fine-tuning data from the simulator. See [runner/README.md](runner/README.md). |
 | `runtime/laya/` | Local Laya: `serve.sh` (safe `laya-serve`), `train_mps.py` (fine-tuning on Apple silicon), `serve_local.py` (serve a fine-tuned checkpoint privately). Virtualenv, data and checkpoints are git-ignored. |
-| `docs/` | Design documents (below) and `spike/`, the first real calls to both models. |
+| `docs/` | Design documents (below), [`HOW-TO/`](docs/HOW-TO/README.md) guides, and `spike/`, the first real calls to both models. |
 
 ## Design documents
 
