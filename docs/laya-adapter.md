@@ -190,6 +190,6 @@ The fine-tuned checkpoint is then pushed to the Hub, and it becomes a new Laya v
 
 ## 10. Open questions
 
-- **Q1. Default decision-time mode:** `measured` (realistic, not exactly rerunnable) or `fixed` (exactly rerunnable, ignores real speed)? Proposal: `measured`, with `fixed` available for quality-only studies. (Implemented this way in the prototype.)
+- **Q1. Default decision-time mode:** `measured` (realistic, not exactly rerunnable) or `fixed` (exactly rerunnable, ignores real speed)? Proposal: `measured`, with `fixed` available for quality-only studies. (Implemented this way in v1.)
 - **Q2. Training labels:** best algorithm's choice (easy, but Laya learns to imitate the algorithm) or hindsight outcomes (harder, but can beat it)? Proposal: start with imitation of Nearest-Car ETA to get a working model, then move to hindsight labels.
 - **Q3. Device for benchmarks:** GPU or CPU? Decision time differs by 5–10×, and on CPU (190–460 ms per decision) it would dominate the results. Proposal: record the device, and treat it as part of the contestant version so they never mix.

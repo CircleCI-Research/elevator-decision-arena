@@ -4,7 +4,7 @@
 
 Every time someone presses a hall button, a building has to decide which car answers. Elevator Decision Arena (EDA) races two contestants on that decision, side by side, under identical conditions: the same building, passengers, seed and events. The contestants can be decision models (such as TypeSafe's **Jev** or Convai's **Laya**, both "System One" models that answer typed questions with calibrated probabilities) or classic dispatch algorithms. It measures who serves passengers best, and whether the comparison is fair.
 
-> **Status: prototype, private until v1.** The building, its traffic and its physics are simulated. The decisions are real: real algorithms, and real model calls through a local runner. Results are rankings *within this simulation*, not claims about real buildings.
+> **Status: v1.** The building, its traffic and its physics are simulated. The decisions are real: real algorithms, and real model calls through a local runner. Results are rankings *within this simulation*, not claims about real buildings.
 
 ## Using it with a coding agent
 
@@ -56,9 +56,9 @@ my go-ahead. Don't change code or settings unless I ask.
 
 ## Quick start
 
-### 1. Just the prototype, with algorithms only (no setup)
+### 1. Just the app, with algorithms only (no setup)
 
-Open `prototype/index.html` in a browser, or serve the folder with any static server. You get the four built-in algorithms (Nearest-Car ETA v1.2.0 and v1.3.0, round robin, zoned dispatch), every page of the app, and no model calls.
+Open `app/index.html` in a browser, or serve the folder with any static server. You get the four built-in algorithms (Nearest-Car ETA v1.2.0 and v1.3.0, round robin, zoned dispatch), every page of the app, and no model calls.
 
 ### 2. With real models (local Laya and/or the Jev API)
 
@@ -103,7 +103,7 @@ Open the app **from the runner's address**. Opened any other way, it has only th
 
 | Path | What |
 |---|---|
-| `prototype/` | The app: vanilla JS, SVG, no build step. `js/sim/` holds the simulator (`world.js`), traffic scenarios (`scenario.js`) and the contestant registry (`registry.js`). See [prototype/README.md](prototype/README.md) for every page and control. |
+| `app/` | The app: vanilla JS, SVG, no build step. `js/sim/` holds the simulator (`world.js`), traffic scenarios (`scenario.js`) and the contestant registry (`registry.js`). See [app/README.md](app/README.md) for every page and control. |
 | `runner/` | Local server (TypeScript, Node): serves the app, holds the keys, encodes decisions and calls the models. Loopback and same-origin only. `tools/export-dataset.ts` exports fine-tuning data from the simulator. See [runner/README.md](runner/README.md). |
 | `runtime/laya/` | Local Laya: `serve.sh` (safe `laya-serve`), `train_mps.py` (fine-tuning on Apple silicon), `serve_local.py` (serve a fine-tuned checkpoint privately). Virtualenv, data and checkpoints are git-ignored. |
 | `docs/` | Design documents (below) and `spike/`, the first real calls to both models. |

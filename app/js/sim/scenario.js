@@ -11,7 +11,7 @@
  * Morning Wave keeps its original hand-tuned generator (`legacy`), so runs
  * recorded before the catalog existed still replicate bit for bit.
  *
- * PLACEHOLDER — the real catalog lives with the engine, with generators
+ * Planned: a shared catalog, with generators
  * validated against measured building traffic.
  */
 (function (EDA) {
@@ -78,7 +78,7 @@
       legacy: true,
       name: 'Morning Wave',
       stresses: ['up-peak', 'mixed traffic', 'overload', 'one fault'],
-      description: 'Lobby up-peak with some down and inter-floor traffic, a heavy group with carts, a car fault and a meeting ending mid-wave. The original prototype scenario.',
+      description: 'Lobby up-peak with some down and inter-floor traffic, a heavy group with carts, a car fault and a meeting ending mid-wave. The original scenario.',
       events: { heavy: { on: true }, fault: { on: true }, spike: { on: true } },
     },
     spec({
@@ -235,7 +235,7 @@
       capacityKg: 420,
       maxRiders: 5,
       vmax: 1.25 * Math.sqrt(Math.max(1, floors / 6)), // floors / s; taller buildings get faster cars
-      // Placeholder energy model. Real coefficients come from a documented
+      // Simplified energy model. Calibrated coefficients would come from a documented
       // method (e.g. ISO 25745) once the engine exists.
       energy: {
         floorHeightM: 3.5,

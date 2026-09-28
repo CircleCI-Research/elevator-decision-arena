@@ -1,4 +1,4 @@
-// Arena runner: serves the prototype and connects it to real System One
+// Arena runner: serves the app and connects it to real System One
 // models. Loopback only. The keys stay in this process: the browser never
 // sees them, and only this origin may call the API.
 //
@@ -16,7 +16,7 @@ import type { DecideBody } from './types.ts';
 
 const HOST = '127.0.0.1';
 const PORT = Number(process.env.ARENA_PORT ?? 8787);
-const ROOT = normalize(join(dirname(fileURLToPath(import.meta.url)), '../../prototype'));
+const ROOT = normalize(join(dirname(fileURLToPath(import.meta.url)), '../../app'));
 const ORIGINS = new Set([`http://${HOST}:${PORT}`, `http://localhost:${PORT}`]);
 const MAX_BODY = 256 * 1024;
 
@@ -175,7 +175,7 @@ const server = createServer(async (req, res) => {
 
 server.listen(PORT, HOST, async () => {
   const ids = await checkBackends(true);
-  console.log(`arena runner on http://${HOST}:${PORT}/  (prototype + API, loopback only)`);
+  console.log(`arena runner on http://${HOST}:${PORT}/  (app + API, loopback only)`);
   for (const [b, id] of Object.entries(ids)) console.log(`  ${b.padEnd(5)} ${id.ok ? 'ok  ' : 'down'} ${id.detail}`);
   await warmUp();
 });

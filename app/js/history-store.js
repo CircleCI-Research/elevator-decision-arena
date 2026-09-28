@@ -1,7 +1,7 @@
 /*
  * Run history: one audit record per run, kept in browser storage.
  *
- * PLACEHOLDER — the real system keeps immutable, exportable run records with
+ * Limitation: records live in this browser's storage. Planned: immutable, exportable run records with
  * full event logs, prompts, schemas and dependency hashes. This stores just
  * enough to list, compare and replicate runs across page reloads.
  */

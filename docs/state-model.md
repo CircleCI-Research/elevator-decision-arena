@@ -4,7 +4,7 @@ Status: **draft for review** · 2026-09-27 · companion to [contestants.md](cont
 
 ## 1. Why this needs its own model
 
-Every decision a contestant makes depends on what it is told. Today the prototype's observation is a handful of fields written inline in `mock-world.js` (`observe()`) and described informally in `SCHEMAS`. That was enough for a mock, but it breaks down as soon as the arena grows:
+Every decision a contestant makes depends on what it is told. Today the app's observation is a handful of fields written inline in `world.js` (`observe()`) and described informally in `SCHEMAS`. That was enough for a mock, but it breaks down as soon as the arena grows:
 
 - **Buildings will differ:** priority floors, cars with different capacities or speeds, cars that only serve some floors, destination panels in the lobby.
 - **The information rules may change:** the spec says models may know only each car's total load and capacity. Some future experiment may want to test what happens when a policy also knows each passenger's weight, so it can move most of the weight straight to its floors.
@@ -77,7 +77,7 @@ The **visibility profile** is separate from features. `priority-floors` changes 
 | `aggregate-load` (default) | Base catalogue plus the feature variables | Exactly the spec's rule. |
 | `passenger-weights` | Adds `cars[].riders[]` (`weightKg`, `destFloor`) and `calls[].waiting[]` (`weightKg`), if the building has destination panels | A labelled **research condition** (decided). Its runs form their own leaderboard families and SLA pools, marked "with passenger weights". `aggregate-load` stays the default and the headline ranking. |
 
-## 5. Catalogue `state v1` (what the prototype already sends)
+## 5. Catalogue `state v1` (what v1 already sends)
 
 | Path | Type · unit · precision | Meaning |
 |---|---|---|
@@ -93,7 +93,7 @@ The **visibility profile** is separate from features. `priority-floors` changes 
 | `cars[].idx` | int | Car index, stable for the run. |
 | `cars[].floor` | number · floors · 0.01 | Position; fractional while moving. |
 | `cars[].dir` | enum `-1`, `0`, `1` | Travel direction; 0 when idle. |
-| `cars[].speed` | number · floors/s | Maximum speed (`vmax` in the prototype, today the same for all cars). |
+| `cars[].speed` | number · floors/s | Maximum speed (`vmax` in v1, today the same for all cars). |
 | `cars[].mode` | enum `normal`, `overload`, `malfunction`, `out` | Operating mode. |
 | `cars[].doorPhase` | enum `closed`, `opening`, `open`, `closing` | Door state. |
 | `cars[].loadKg` | int · kg · 1 kg | Total load now. Never broken down per passenger in this profile. |
@@ -102,7 +102,7 @@ The **visibility profile** is separate from features. `priority-floors` changes 
 | `cars[].assigned` | int | Hall calls assigned and not yet served. |
 | `cars[].coming` | bool | Already assigned to this very call. |
 
-Two small changes from the prototype: `vmax` and `capacityKg` move to **per-car** fields (so `heterogeneous-cars` needs no schema change), and `floors` moves under `building`.
+Two small changes from v1: `vmax` and `capacityKg` move to **per-car** fields (so `heterogeneous-cars` needs no schema change), and `floors` moves under `building`.
 
 ### 5.1 Planned for `state v1.1`: priority and history
 

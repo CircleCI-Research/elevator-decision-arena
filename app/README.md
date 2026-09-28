@@ -1,6 +1,6 @@
-# Elevator Decision Arena: phase 1 visual prototype
+# Elevator Decision Arena: the app
 
-This prototype explores the look and feel only. Open `index.html` directly in a browser. There is no build step and no server.
+Vanilla JS and SVG, with no build step. Open `index.html` directly for the algorithms only, or serve it through the arena runner (`runner/`) for live models.
 
 ## Direction chosen: "Transit Pictogram"
 
@@ -176,14 +176,14 @@ Live models take real time: the world waits for each answer, so their wall-clock
 
 Still to explore: folding idle floor ranges in very tall towers, grouping many cars into low-rise and high-rise banks, and a camera that follows the busiest floors.
 
-## Intentional placeholders
+## Known limitations and plans
 
-| Area | Placeholder | Later phase |
+| Area | Current state | Planned |
 | --- | --- | --- |
 | `js/sim/world.js` | A minimal stand-in world that just drives the animations. Motion, dispatch and door logic are simplified. | Domain-neutral engine: event queue, safety layer, observation schema, replay |
 | `js/sim/registry.js` | Four deterministic algorithms (Nearest-Car ETA v1.2.0 and v1.3.0, round robin, zoned dispatch). Real code, deliberately simple. | Algorithm packages with signed code hashes, registered through manifests |
 | `js/sim/scenario.js` | One hand-tuned wave with a scripted heavy group, a fault on Car 3 and a floor-3 spike. | Scenario catalog, configurable floors, cars and arrivals, seeds |
-| Elevator energy | Placeholder physics in `js/sim/world.js`, with coefficients in `CONFIG.energy`. The motor lifts the car-versus-counterweight imbalance (counterweight = car + 45% of capacity), so cost depends on direction, load and height. It adds friction, a fixed cost per start (short hops cost more per metre), door cycles and standby per car, and credits energy recovered by a regenerative drive. Floors are a uniform 3.5 m. | A documented method (e.g. ISO 25745), per-floor heights including basements, and energy attributed to the decision that caused each move |
+| Elevator energy | Simplified physics in `js/sim/world.js`, with coefficients in `CONFIG.energy`. The motor lifts the car-versus-counterweight imbalance (counterweight = car + 45% of capacity), so cost depends on direction, load and height. It adds friction, a fixed cost per start (short hops cost more per metre), door cycles and standby per car, and credits energy recovered by a regenerative drive. Floors are a uniform 3.5 m. | A documented method (e.g. ISO 25745), per-floor heights including basements, and energy attributed to the decision that caused each move |
 | Run history | Summary records in browser storage: definition, results, downsampled trends. No event logs, prompts or schemas. | Immutable, exportable run records with full event logs, prompts, schemas and dependency hashes (Audit & replay) |
 | Run files | JSON with definition, decisions, results and hashes; unsigned, and the last 15 kept in browser storage. | Signed, immutable run files with prompts, schemas and dependency hashes in a run store |
 | Leaderboard | Families from browser-stored records; unpaired t-intervals; equal-weight overall rank; any registered contestants, with a *Controlled only* filter. | Paired per-scenario analysis over a curated scenario catalog, contestant versions from a registry, configurable weights |

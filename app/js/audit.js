@@ -8,7 +8,7 @@
  * models are not repeatable), and verification checks that the replay
  * reproduces the recorded results.
  *
- * PLACEHOLDER — real run files will also carry prompts, schemas, dependency
+ * Planned: run files will also carry prompts, schemas, dependency
  * hashes and signatures, and live in an immutable store.
  */
 (function (EDA) {
@@ -58,7 +58,7 @@
 
   // Integrity of the decision log itself. Replay catches any edit that
   // changes what happened; this also catches edits that changed nothing.
-  // PLACEHOLDER: a recomputable hash is not tamper-proof — that needs signed
+  // Limitation: a recomputable hash is not tamper-proof — that needs signed
   // run files.
   function decisionsHash(decisions) {
     return fnv(JSON.stringify(Object.keys(decisions).sort().map((k) => [k, decisions[k]])));
@@ -78,7 +78,7 @@
       formatVersion: FORMAT_VERSION,
       exportedAt: new Date().toISOString(),
       simulator: SIM_VERSION,
-      note: 'Prototype run file: simulated building and traffic; decisions from the contestants listed (live models recorded, never re-asked).',
+      note: 'Elevator Decision Arena run file: simulated building and traffic; decisions from the contestants listed (live models recorded, never re-asked).',
       run: { id: run.id, createdAt: rec.createdAt, finishedAt: rec.finishedAt, status: rec.status, modes: rec.modes },
       definition: rec.def,
       scenarioSpec: run.cfg.scenarioSpec,

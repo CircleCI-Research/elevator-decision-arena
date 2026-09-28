@@ -6,7 +6,7 @@
  * family raw metrics are comparable; across families they aren't. Reruns of
  * an identical definition count once, so replications don't inflate n.
  *
- * PLACEHOLDER — the real leaderboard will use paired, per-scenario analysis
+ * Planned: paired, per-scenario analysis
  * over a curated scenario catalog, with policy versions from the registry.
  */
 (function (EDA) {

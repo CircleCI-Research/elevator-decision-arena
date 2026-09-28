@@ -1,6 +1,6 @@
 # Arena runner
 
-Serves the prototype and connects it to real **System One** models: local **Laya** (through `laya-serve`) and **Jev** (through api.typesafe.ai). The keys stay in this process; the browser never sees them.
+Serves the app and connects it to real **System One** models: local **Laya** (through `laya-serve`) and **Jev** (through api.typesafe.ai). The keys stay in this process; the browser never sees them.
 
 ```sh
 runtime/laya/serve.sh        # terminal 1: local Laya on 127.0.0.1:8000 (optional)
@@ -24,7 +24,7 @@ Values are never logged, returned or written to run files. Run files record the 
 
 | Endpoint | Purpose |
 |---|---|
-| `GET /` and static files | The prototype (`../prototype`) |
+| `GET /` and static files | The app (`../app`) |
 | `GET /api/contestants` | Live contestants with setup facets and availability. Identity is checked every 30 s: Laya's `/health` must report the pinned commit, and Jev's `/v1/models` must answer. |
 | `GET /api/health` | Backend checks, forced |
 | `POST /api/decide` | One decision: observation and legal options in; probabilities, choice, timings, token cost and the raw request and response out |
@@ -49,7 +49,7 @@ The runner prints one line per real model call: time, contestant, round trip, ch
 
 - Binds `127.0.0.1` only.
 - Rejects any request whose `Host` isn't the runner's own (DNS rebinding) and any `POST` whose `Origin` isn't the runner's own page, so other sites open in the same browser can't spend the API key.
-- Serves static files from `../prototype` only, with path traversal blocked, and caps request bodies at 256 KB.
+- Serves static files from `../app` only, with path traversal blocked, and caps request bodies at 256 KB.
 
 ## Tests
 

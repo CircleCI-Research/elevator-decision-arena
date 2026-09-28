@@ -1,6 +1,6 @@
 // Export a Laya fine-tuning dataset from the arena's simulator.
 //
-// Runs the browser prototype's world headless with a teacher policy driving,
+// Runs the app's simulator headless with a teacher policy driving,
 // and at every decision records exactly what a live contestant would be
 // sent (the runner's own encoder) plus a label. Pilot: imitation labels, the
 // teacher's choice as a one-hot target.
@@ -18,7 +18,7 @@ import vm from 'node:vm';
 import { encode } from '../src/encoding.ts';
 import type { Observation, Opt } from '../src/types.ts';
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../../prototype');
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../../app');
 const EVAL_SEEDS = [1001, 1010];
 
 function arg(name: string, def: string): string {

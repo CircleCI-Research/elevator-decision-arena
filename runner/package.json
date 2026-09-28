@@ -2,7 +2,7 @@
   "name": "arena-runner",
   "version": "0.1.0",
   "private": true,
-  "description": "Serves the arena prototype and connects it to real System One models (local Laya, Jev API). Loopback only.",
+  "description": "Serves the arena app and connects it to real System One models (local Laya, Jev API). Loopback only.",
   "type": "module",
   "engines": { "node": ">=22.6" },
   "scripts": {

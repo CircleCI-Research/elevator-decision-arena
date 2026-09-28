@@ -1,7 +1,7 @@
 /*
- * Stand-in world that drives the visual prototype.
+ * The simulator (mock-world): a simplified elevator world, deterministic for a seed.
  *
- * PLACEHOLDER — this is not the simulation engine. It is the least behavior
+ * Simplified by design: it models the behaviour the benchmark needs, the least behavior
  * that makes every visual state appear: calls, duplicate presses, boarding,
  * overloads, faults and reassignment. The real engine (event queue, safety
  * layer, observation schema, metrics, replay) replaces this file in a later
@@ -787,7 +787,7 @@
       }
     }
 
-    // ── Energy (placeholder physics) ─────────────────────────────────────
+    // ── Energy (simplified physics) ──────────────────────────────────────
 
     addEnergy(c, wh) {
       c.energy.net += wh;

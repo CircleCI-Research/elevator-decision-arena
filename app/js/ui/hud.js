@@ -186,7 +186,7 @@
     { label: 'P95 wait', v: (s) => s.p95Wait, f: (s) => secs(s.p95Wait), better: 'low' },
     { label: 'Longest wait', v: (s) => s.longest, f: (s) => secs(s.longest), better: 'low' },
     { label: 'Waiting now', v: (s) => s.waiting, f: (s) => String(s.waiting), better: 'low' },
-    { group: 'Elevator energy', note: 'placeholder physics' },
+    { group: 'Elevator energy', note: 'simplified physics' },
     { label: 'Net energy', v: (s) => s.energyWh, f: (s) => wh(s.energyWh), better: 'low' },
     { label: 'Per passenger', v: (s) => (s.delivered ? s.energyWh / s.delivered : null), f: (s) => (s.delivered ? wh(s.energyWh / s.delivered, 2) : '—'), better: 'low' },
     { label: 'Recovered (regen)', v: (s) => s.regenWh, f: (s) => wh(s.regenWh), better: 'high' },

@@ -21,7 +21,7 @@ import vm from 'node:vm';
 import { encode } from '../src/encoding.ts';
 import type { Observation, Opt } from '../src/types.ts';
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../../prototype');
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../../app');
 const EVAL = [1001, 1010];
 const H = 1 / 60;
 

@@ -52,7 +52,7 @@ const jevRemote = httpTransport({ baseURL: 'https://api.typesafe.ai', apiKey: en
 
 ## 4. Where keys and calls live
 
-The prototype runs entirely in the browser. API keys can't. The engine phase adds a small **local runner**:
+The app runs in the browser. API keys can't. The engine phase adds a small **local runner**:
 
 ```
 browser (UI) ──WebSocket──▶ arena runner (Node, TypeScript, 127.0.0.1)
@@ -158,7 +158,7 @@ Nearest-Car ETA joins every set as the reference algorithm, because Laya's base 
 3. **Setup facets and check:** facet hashing in the registry, the setup-check panel in New experiment, verdicts in run records, and the leaderboard filter.
 4. **Demo sets 1–3**, then a write-up of the results.
 
-The facets and the setup check can be built into the **prototype first**, with mock Laya and Jev contestants, so the UI can be reviewed before any real call is made.
+The facets and the setup check can be built into the **app first**, with mock Laya and Jev contestants, so the UI can be reviewed before any real call is made.
 
 ## 10. Decisions
 
@@ -169,15 +169,15 @@ The facets and the setup check can be built into the **prototype first**, with m
 | Q3 | One shared timeout for the demo? | Yes: 1.5 s shared, for sets 1 and 2. |
 | Q4 | Encoding study (set 3) in the first demo? | Yes. |
 
-## 11. Prototype status
+## 11. Status in the app
 
-The setup check is built into the prototype with mock contestants (`prototype/js/setup.js`, `prototype/js/ui/setup-view.js`):
+The setup check is built into the app (`app/js/setup.js`, `app/js/ui/setup-view.js`), first with mock contestants (since removed):
 
 - **Laya · local** and **Jev · API** in encodings 1 and 2, with facets as in §5 and scripted quality and latency. There are no calls and no keys.
 - **Decision timing:** `measured` or `fixed`, and each contestant's own timeout or a shared one. Timeouts hand the decision to the fallback, and the handover is recorded, replayed and verified.
 - **Verdicts**, following the rule in §6, refined to "exactly one thing differs": either the decider (model or code, with its tuning and what comes with it), or one harness facet such as the encoding. So *Laya · local enc1 vs enc2* is controlled and compares the encoding.
 - **Where verdicts show:** the New experiment panel with one-click fixes, chips in Run history and on the Experiment card, a line in Audit, and a *Controlled only* filter on the Leaderboard.
-- **Not yet in the prototype:** a *not comparable* verdict (no registered pairing needs it yet), a network baseline, token-cost metrics and model-drift checks. Those need the real transports.
+- **Not yet in the app:** a *not comparable* verdict (no registered pairing needs it yet), a network baseline, token-cost metrics and model-drift checks. Those need the real transports.
 
 ## 12. Spike results: Jev (2026-09-27)
 
@@ -230,10 +230,10 @@ Consequences:
 
 ## 14. Live connection (2026-09-27)
 
-The runner (`runner/`) and the prototype now race **real** Laya and Jev:
+The runner (`runner/`) and the app now race **real** Laya and Jev:
 
-- **Runner:** Node and TypeScript, with no dependencies, on `127.0.0.1:8787`. It serves the prototype, holds the keys, and implements §3 (one System One transport, encodings 1 and 2), §5 (facets per live contestant) and §7 (timeouts, one 429/529 retry, queueing reported separately, drift check on Jev's `model`, identity via Laya's `/health`).
-- **Engine:** still the browser prototype. §4 put the engine in the runner. For now the runner is a decision proxy, and the browser world holds while a live answer is out, then lands it after its measured time. Results depend only on the record, so replay verification works unchanged. Moving the engine into the runner remains the plan for the engine phase.
+- **Runner:** Node and TypeScript, with no dependencies, on `127.0.0.1:8787`. It serves the app, holds the keys, and implements §3 (one System One transport, encodings 1 and 2), §5 (facets per live contestant) and §7 (timeouts, one 429/529 retry, queueing reported separately, drift check on Jev's `model`, identity via Laya's `/health`).
+- **Engine:** still in the browser app. §4 put the engine in the runner. For now the runner is a decision proxy, and the browser world holds while a live answer is out, then lands it after its measured time. Results depend only on the record, so replay verification works unchanged. Moving the engine into the runner remains the plan for the engine phase.
 - **First real race** (6 × 3, Morning Wave, seed 24301, shared 1.5 s timeout, *Controlled · decider*): Jev cleared the wave in 1:51.9 and local Laya in 2:03.1. Average wait was 21.8 s against 24.8 s, and decision time 207 ms against 50 ms. There were 49 real decisions, no fallbacks, and $0.0004 of API cost. Replay verified 26/26 and 23/23 decisions. One seed is not a ranking.
 - **Not yet:** benching after repeated failures, a network baseline per run, a per-run cost cap, and batches sized with cost in mind.
 
@@ -263,7 +263,7 @@ Framing, doing the arithmetic in the encoding, closes Jev's gap to the heuristic
 
 ## 17. Simulator fix: mock-world 0.2 (2026-09-27)
 
-Watching a run showed a passenger stepping out of the same overloaded car again and again. There were two bugs in the prototype world:
+Watching a run showed a passenger stepping out of the same overloaded car again and again. There were two bugs in the simulated world:
 
 1. **Re-boarding:** a passenger who stepped out to clear an overload was barred from that car only until its doors closed, so they got back in at its next stop and overloaded it again. Now they remember the car, and board it again only when it has room for them. That counts the weight of people still walking in, which wasn't counted before.
 2. **Who steps out:** the passenger asked to leave was whoever reached their spot inside last, not whoever got in last. A slow passenger with a cart was repeatedly the one sent out. Now it's by boarding order.

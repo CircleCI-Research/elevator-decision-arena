@@ -1,6 +1,6 @@
 # Contestants: adding algorithms and models
 
-Status: **draft for review** · 2026-09-27 · applies to the engine phase (after the phase 1 visual prototype)
+Status: **design document** · 2026-09-27, updated for v1 on 2026-09-28
 
 ## 1. Purpose
 
@@ -24,20 +24,20 @@ Elevator Decision Arena compares elevator dispatch policies under identical cond
 - More than two contestants per run. The arena shows two buildings side by side. Leagues across many contestants come from many runs, as they do today.
 - Hosting third-party models on behalf of others.
 
-## 2. What the prototype already establishes
+## 2. What v1 already establishes
 
-The phase 1 prototype (`prototype/js/sim/registry.js`, originally with eight mock contestants, now four algorithms plus live models from the runner) has a working registry, and the rest of the app already consumes it generically:
+The v1 app (`app/js/sim/registry.js`, originally with eight mock contestants, now four algorithms plus live models from the runner) has a working registry, and the rest of the app already consumes it generically:
 
 - Lane A and Lane B pickers in New experiment; any pairing except a policy against itself.
 - Kind-specific provenance stored in every run record and run file (prompt and config hashes for models, source and code hash for algorithms).
 - Replay feeds recorded decisions back in and never re-asks the policy. Verification checks the definition hash, per-decision request matching, the result fingerprint and a decision-log hash.
 - Leaderboard and SLA lab treat contestants as a league (registry colours, provisional status below 5 runs).
 
-The engine phase keeps these behaviours and replaces the mocks with real adapters. Three prototype shortcuts must **not** carry over (see §4.3):
+The engine phase keeps these behaviours and replaces the mocks with real adapters. Three shortcuts from the early app must **not** carry over into the engine (see §4.3):
 
-1. Prototype policies build their own list of options. In the engine, **the engine** offers the legal options.
-2. Prototype policies report their own latency. In the engine, **the engine** measures it.
-3. Prototype "models" are scripted softmaxes. Real models run through adapters.
+1. In-process algorithms build their own list of options. In the engine, **the engine** offers the legal options.
+2. In-process algorithms report their own latency. In the engine, **the engine** measures it.
+3. The early mock "models" were scripted softmaxes (since removed). Real models run through adapters.
 
 ## 3. Concepts
 
@@ -89,10 +89,10 @@ Every variable in the observation is defined, versioned and filtered by the expe
 - `distribution` is optional. Deterministic contestants may omit it, and the engine then records a one-hot distribution. Models should return it so the decision panels and audit can show their uncertainty.
 - Anything else is ignored. A malformed action is treated as a failure (§7).
 
-### 4.3 Changes from the prototype
+### 4.3 Changes from the early app
 
-- **The engine builds `options`.** The contestant picks among them and cannot invent actions. The safety layer still re-checks every choice at commit time, because the world can change while a model is thinking (a car may fail). A vetoed choice is recorded and the request is retried, as the prototype already does.
-- **The engine measures latency** from request to answer, per decision. Contestants no longer report it. Sim-time semantics stay as in the prototype: the decision lands `latency` seconds after it was requested.
+- **The engine builds `options`.** The contestant picks among them and cannot invent actions. The safety layer still re-checks every choice at commit time, because the world can change while a model is thinking (a car may fail). A vetoed choice is recorded and the request is retried, as v1 already does.
+- **The engine measures latency** from request to answer, per decision. Contestants no longer report it. Sim-time semantics stay as in v1: the decision lands `latency` seconds after it was requested.
 - **Energy per decision** is measured by the adapter where possible (device power for local models) and otherwise estimated, with the source (`measured | estimated`) recorded.
 
 ## 5. Adapters
@@ -185,7 +185,7 @@ Run automatically at registration and shown on the contestant's card:
 |---|---|---|
 | Answer later than `timeout_ms` | The fallback decides this request | `timeout` + the fallback's decision |
 | Crash, transport error, unparsable answer | The fallback decides | `failure` with the reason |
-| Choice vetoed at commit (the world changed) | Request retried | `vetoed` (already in the prototype) |
+| Choice vetoed at commit (the world changed) | Request retried | `vetoed` (already in v1) |
 | Illegal choice (not in `options`) | Rejected, the fallback decides | `violation`, and counted against the contestant in Safety |
 | Repeated failures | After N consecutive failures the contestant is benched and the fallback finishes the run | `benched` at time t |
 
@@ -199,12 +199,12 @@ Every run record and run file stores, per lane, the version reference plus kind-
 - **Algorithms:** bundle hash, entry point, parameters and runtime.
 - **Both:** contract version and hash, fallback reference, and the measured latency and energy per decision.
 
-Replay works as it does in the prototype:
+Replay works as it does in v1:
 
 - recorded decisions are fed back in, and models are **never** re-asked;
 - algorithms can additionally be **re-executed** from their bundle as an independent check. A difference means the bundle or the engine isn't deterministic, and is flagged in Audit.
 
-The prototype's run file needs a small extension: store the rendered prompt and raw response for model decisions, and each decision's measured latency and energy source.
+The v1 run file already stores the raw request and response of live-model decisions; it still needs a small extension: store the rendered prompt and raw response for model decisions, and each decision's measured latency and energy source.
 
 ## 9. UI changes
 
@@ -215,7 +215,7 @@ The prototype's run file needs a small extension: store the rendered prompt and 
 
 ## 10. Phased delivery
 
-1. **Contract v1 and the in-process adapter.** Port the prototype algorithms to manifests and bundles, move option building and latency measurement into the engine, and add the validation suite.
+1. **Contract v1 and the in-process adapter.** Port the v1 algorithms to manifests and bundles, move option building and latency measurement into the engine, and add the validation suite.
 2. **Laya through its adapter:** see [laya-adapter.md](laya-adapter.md). Add the request and response log, measured latency, fallback handling and benching.
 3. **Registration UI** and the deprecation flow.
 4. **Local-model adapter generalised**, for other local models.

@@ -1,5 +1,5 @@
 /*
- * Prototype director.
+ * App director.
  *
  * An experiment is defined once, in the New experiment dialog, and becomes a
  * run. Its parameters are fixed for the life of the run. Several runs can
@@ -1107,7 +1107,7 @@
     if (!st.connected) return;
     const up = st.contestants.filter((c) => c.available).length;
     $('page-foot').textContent =
-      'Prototype. The building, its traffic and physics are simulated. Decisions come from real algorithms and real models: local Laya and the Jev API, through the arena runner. Results are rankings within this simulation, not of real buildings.';
+      'The building, its traffic and physics are simulated. Decisions come from real algorithms and real models: local Laya and the Jev API, through the arena runner. Results are rankings within this simulation, not of real buildings.';
     $('sb-foot').textContent = `Simulated building and traffic. Decisions from real algorithms and ${up} of ${st.contestants.length} live models, through the arena runner.`;
     toast(`Arena runner connected: ${up} of ${st.contestants.length} live models available`);
     guard('live', () => {
