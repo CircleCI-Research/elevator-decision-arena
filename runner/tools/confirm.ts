@@ -51,7 +51,80 @@ export const SPEC = {
   rerunRule: 'a run where more than 5% of a live lane\'s decisions failed or fell back is rerun once, and both are reported',
 };
 
-export const specHash = () => createHash('sha256').update(JSON.stringify(SPEC)).digest('hex');
+// Run 2 (docs/confirmation/preregistration-2.md): the Laya claims, and
+// whether the fixed option order mattered (shuffled twins, enc*s).
+const PILOT = 'laya-ft@pilot-imitation-enc3-bd0835f'; // the office imitation fine-tune, pinned by its weights hash
+const OFFICE_PAIRS = [
+  ['laya-local@enc1', 'round-robin@v1.0.0'],
+  [PILOT, 'laya-local@enc3'],
+  ['nearest-car-eta@v1.3.0', 'nearest-car-eta@v1.2.0'],
+  ['jev@enc3', 'jev@enc3s'],
+  ['jev@enc1', 'jev@enc1s'],
+  [`${PILOT}-shuffled`, 'zoned@v1.0.0'],
+];
+export const SPEC2 = {
+  name: 'EDA confirmation run 2',
+  simulator: 'eda-sim 0.2',
+  conditions: [
+    { id: 'normal', floors: 24, cars: 4, scenario: 'normal' },
+    { id: 'morning-wave', floors: 24, cars: 4, scenario: 'morning-wave' },
+    { id: '12x3-down-peak', floors: 12, cars: 3, scenario: 'down-peak' },
+  ],
+  seeds: [3001, 3030], // fresh: never used for anything, including confirmation run 1 (2001-2030)
+  timing: { mode: 'fixed', fixedS: 0.25, timeout: 'own' },
+  pairings: {
+    normal: OFFICE_PAIRS,
+    'morning-wave': OFFICE_PAIRS,
+    '12x3-down-peak': [
+      [PILOT, 'nearest-car-eta@v1.2.0'],
+      ['nearest-car-eta@v1.3.0', 'round-robin@v1.0.0'],
+    ],
+  },
+  metric: 'avgWait',
+  primary: [
+    // H3: zero-shot base Laya on raw numbers waits longer than round robin.
+    { id: 'H3-normal', kind: 'difference', a: 'laya-local@enc1', b: 'round-robin@v1.0.0', condition: 'normal', expect: 'positive' },
+    { id: 'H3-morning-wave', kind: 'difference', a: 'laya-local@enc1', b: 'round-robin@v1.0.0', condition: 'morning-wave', expect: 'positive' },
+    // H4: the imitation fine-tune waits less than base Laya with the same encoding.
+    { id: 'H4-normal', kind: 'difference', a: PILOT, b: 'laya-local@enc3', condition: 'normal', expect: 'negative' },
+    { id: 'H4-morning-wave', kind: 'difference', a: PILOT, b: 'laya-local@enc3', condition: 'morning-wave', expect: 'negative' },
+    // H5: the fine-tune is equivalent to its teacher within ±1.5 s.
+    { id: 'H5-normal', kind: 'equivalence', a: PILOT, b: 'nearest-car-eta@v1.3.0', condition: 'normal', margin: 1.5 },
+    { id: 'H5-morning-wave', kind: 'equivalence', a: PILOT, b: 'nearest-car-eta@v1.3.0', condition: 'morning-wave', margin: 1.5 },
+    // H6: in a building it never saw, the office fine-tune is equivalent to Nearest-Car v1.2.0 within ±1.5 s.
+    { id: 'H6-12x3-down-peak', kind: 'equivalence', a: PILOT, b: 'nearest-car-eta@v1.2.0', condition: '12x3-down-peak', margin: 1.5 },
+    // H7: option order doesn't matter for Jev with the arrival estimate (shuffled ≡ fixed within ±1.5 s).
+    { id: 'H7-normal', kind: 'equivalence', a: 'jev@enc3s', b: 'jev@enc3', condition: 'normal', margin: 1.5 },
+    { id: 'H7-morning-wave', kind: 'equivalence', a: 'jev@enc3s', b: 'jev@enc3', condition: 'morning-wave', margin: 1.5 },
+  ],
+  alpha: 0.05, // family-wise, Holm across the nine primary tests
+  exploratory: [
+    { a: 'jev@enc1s', b: 'jev@enc1', conditions: ['normal', 'morning-wave'] },
+    { a: `${PILOT}-shuffled`, b: PILOT, conditions: ['normal', 'morning-wave'] },
+    { a: PILOT, b: 'round-robin@v1.0.0', conditions: ['normal', 'morning-wave'] },
+    { a: 'jev@enc3', b: 'nearest-car-eta@v1.2.0', conditions: ['normal', 'morning-wave'] },
+    { a: 'laya-local@enc3', b: 'round-robin@v1.0.0', conditions: ['normal', 'morning-wave'] },
+    { a: PILOT, b: 'nearest-car-eta@v1.3.0', conditions: ['12x3-down-peak'] },
+    { a: 'nearest-car-eta@v1.2.0', b: 'round-robin@v1.0.0', conditions: ['normal', 'morning-wave', '12x3-down-peak'] },
+  ],
+  positions: 'per-position choice rates for every live lane, from the run files, against the position of the lowest-ETA car',
+  rerunRule: 'a run where more than 5% of a live lane\'s decisions failed or fell back is rerun once, and both are reported',
+};
+
+const SPECS: Record<string, any> = { 1: SPEC, 2: SPEC2 };
+const pick = () => SPECS[arg('spec', '1')!] ?? (() => { throw new Error('unknown --spec'); })();
+export const specHash = (S: any = SPEC) => createHash('sha256').update(JSON.stringify(S)).digest('hex');
+
+// Both spec shapes, normalised: conditions, pairings per condition, hypotheses and exploratory pairs.
+function shape(S: any) {
+  const conditions = S.conditions ?? S.scenarios.map((sc: string) => ({ id: sc, floors: S.building.floors, cars: S.building.cars, scenario: sc }));
+  const pairsFor = (id: string) => (Array.isArray(S.pairings) ? S.pairings : S.pairings[id]);
+  const primary = S.primary.map((h: any) => ({ ...h, condition: h.condition ?? h.scenario, expect: h.expect ?? 'negative' }));
+  const exploratory = S.exploratory.flatMap((e: any) =>
+    Array.isArray(e) ? conditions.map((c: any) => ({ a: e[0], b: e[1], condition: c.id })) : e.conditions.map((c: string) => ({ a: e.a, b: e.b, condition: c }))
+  );
+  return { conditions, pairsFor, primary, exploratory };
+}
 
 function arg(name: string, def: string | null): string | null {
   const i = process.argv.indexOf(`--${name}`);
@@ -141,14 +214,16 @@ export function holm(ps: number[]): number[] {
 // ── Running ────────────────────────────────────────────────────────────────
 
 async function main() {
+  const S = pick();
   if (process.argv.includes('--spec-hash')) {
-    console.log(specHash());
+    console.log(specHash(S));
     return;
   }
-  const [s0, s1] = (arg('seeds', null) ?? `${SPEC.seeds[0]}-${SPEC.seeds[1]}`).split('-').map(Number);
+  const { conditions, pairsFor, primary: hyps, exploratory: expl } = shape(S);
+  const [s0, s1] = (arg('seeds', null) ?? `${S.seeds[0]}-${S.seeds[1]}`).split('-').map(Number);
   const seeds = Array.from({ length: (s1 ?? s0) - s0 + 1 }, (_, i) => s0 + i);
   const preregistered = !arg('seeds', null);
-  const out = arg('out', join(dirname(fileURLToPath(import.meta.url)), '../../docs/findings/evidence/confirm'))!;
+  const out = arg('out', join(dirname(fileURLToPath(import.meta.url)), `../../docs/findings/evidence/${S === SPEC ? 'confirm' : `confirm-${arg('spec', '1')}`}`))!;
   mkdirSync(join(out, 'runs'), { recursive: true });
 
   const mem = new Map<string, string>();
@@ -159,7 +234,7 @@ async function main() {
     vm.runInContext(readFileSync(join(ROOT, f), 'utf8'), ctx, { filename: f });
   }
   const EDA = ctx.EDA;
-  if (EDA.history.SIM_VERSION !== SPEC.simulator) throw new Error(`simulator is ${EDA.history.SIM_VERSION}, spec says ${SPEC.simulator}`);
+  if (EDA.history.SIM_VERSION !== S.simulator) throw new Error(`simulator is ${EDA.history.SIM_VERSION}, spec says ${S.simulator}`);
 
   // Live contestants from the runner, asked through it.
   const man = await (await fetch(`${RUNNER}/api/contestants`)).json();
@@ -178,13 +253,13 @@ async function main() {
     }
   };
   EDA.registry.setLive(man.contestants, ask);
-  const cids = [...new Set(SPEC.pairings.flat())];
+  const cids: string[] = [...new Set<string>(conditions.flatMap((c: any) => pairsFor(c.id).flat()))];
   for (const cid of cids) {
     const p = EDA.registry.byCid(cid);
     if (!p) throw new Error(`contestant ${cid} is not available`);
     if (p.live && !p.available) throw new Error(`${cid} is offline: ${p.status}`);
   }
-  console.log(JSON.stringify({ spec: specHash(), preregistered, seeds: `${seeds[0]}-${seeds.at(-1)}`, runner: man.runner }));
+  console.log(JSON.stringify({ spec: specHash(S), name: S.name, preregistered, seeds: `${seeds[0]}-${seeds.at(-1)}`, runner: man.runner }));
 
   const tick = () => new Promise((r) => setTimeout(r, 2));
   async function playWorld(w: any) {
@@ -199,9 +274,10 @@ async function main() {
   }
 
   let nextId = 1;
-  async function race(scn: string, seed: number, pair: string[]) {
-    const spec = EDA.scenario.byId(scn);
-    const cfg = EDA.scenario.makeConfig(SPEC.building.floors, SPEC.building.cars, { seed, scenario: spec, events: EDA.scenario.defaultEvents(spec), timing: SPEC.timing });
+  async function race(cond: any, seed: number, pair: string[]) {
+    const scn = cond.id;
+    const spec = EDA.scenario.byId(cond.scenario);
+    const cfg = EDA.scenario.makeConfig(cond.floors, cond.cars, { seed, scenario: spec, events: EDA.scenario.defaultEvents(spec), timing: S.timing });
     const script = EDA.scenario.buildScript(cfg);
     const C = pair.map((cid, i) => ({ key: 'AB'[i], policy: EDA.registry.byCid(cid) }));
     const run: any = { id: nextId++, cfg, def: { mode: 'fast' }, modes: new Set(['fast']), passengers: script.arrivals.length, createdAt: Date.now(), done: false };
@@ -210,18 +286,18 @@ async function main() {
     await Promise.all(run.worlds.map(playWorld));
     run.done = run.worlds.every((w: any) => w.finishedAt !== null);
     const bundle = EDA.audit.bundleFromRun(run, C);
-    return { scn, seed, pair, bundle };
+    return { scn, cond, seed, pair, bundle };
   }
 
   const jobs: Promise<any>[] = [];
-  for (const scn of SPEC.scenarios) for (const seed of seeds) for (const pair of SPEC.pairings) jobs.push(race(scn, seed, pair));
+  for (const cond of conditions) for (const seed of seeds) for (const pair of pairsFor(cond.id)) jobs.push(race(cond, seed, pair));
   const t0 = performance.now();
   const done = await Promise.all(jobs);
 
   // Rerun rule: a live lane with more than 5% failed or fallback decisions.
   const bad = (b: any) => b.contestants.some((c: any) => c.live && (b.results[c.key].fallbacks ?? 0) > 0.05 * b.results[c.key].decisions);
   const reruns: any[] = [];
-  for (const d of done) if (bad(d.bundle)) reruns.push(await race(d.scn, d.seed, d.pair));
+  for (const d of done) if (bad(d.bundle)) reruns.push(await race(d.cond, d.seed, d.pair));
 
   // Values per contestant, scenario and seed (the first run; reruns reported separately).
   const val = new Map<string, number>();
@@ -229,7 +305,7 @@ async function main() {
   for (const d of done) {
     for (const c of d.bundle.contestants) {
       const r = d.bundle.results[c.key];
-      val.set(`${c.cid}|${d.scn}|${d.seed}`, r[SPEC.metric]);
+      val.set(`${c.cid}|${d.scn}|${d.seed}`, r[S.metric]);
       extra.set(`${c.cid}|${d.scn}|${d.seed}`, { p95Wait: r.p95Wait, decisions: r.decisions, fallbacks: r.fallbacks, drifted: r.drifted ?? 0, apiCostUsd: r.apiCostUsd ?? 0, apiTokens: r.apiTokens ?? 0 });
     }
     const name = `${d.scn}-seed${d.seed}-${d.pair.join('_vs_').replace(/[@.]/g, '-')}.json`;
@@ -238,25 +314,25 @@ async function main() {
   const series = (cid: string, scn: string) => seeds.map((s) => val.get(`${cid}|${scn}|${s}`) as number);
   const mean = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / xs.length;
 
-  const primary = SPEC.primary.map((h: any) => {
-    const pr = paired(series(h.a, h.scenario), series(h.b, h.scenario));
+  const primary = hyps.map((h: any) => {
+    const pr = paired(series(h.a, h.condition), series(h.b, h.condition));
     const p = h.kind === 'equivalence' ? tost(pr, h.margin) : pr.p;
     return { ...h, ...pr, pTest: p, diffs: undefined };
   });
   const adj = holm(primary.map((h: any) => h.pTest));
   primary.forEach((h: any, i: number) => {
     h.pHolm = adj[i];
-    h.supported = h.pHolm < SPEC.alpha && (h.kind === 'equivalence' || h.mean < 0);
+    h.supported = h.pHolm < S.alpha && (h.kind === 'equivalence' || (h.expect === 'positive' ? h.mean > 0 : h.mean < 0));
   });
-  const exploratory = SPEC.scenarios.flatMap((scn) => SPEC.exploratory.map(([a, b]) => ({ a, b, scenario: scn, ...paired(series(a, scn), series(b, scn)), diffs: undefined })));
-  const means = Object.fromEntries(cids.flatMap((cid) => SPEC.scenarios.map((scn) => [`${cid}|${scn}`, mean(series(cid, scn))])));
+  const exploratory = expl.map((e: any) => ({ ...e, scenario: e.condition, ...paired(series(e.a, e.condition), series(e.b, e.condition)), diffs: undefined }));
+  const means = Object.fromEntries(conditions.flatMap((c: any) => [...new Set<string>(pairsFor(c.id).flat())].map((cid) => [`${cid}|${c.id}`, mean(series(cid, c.id))])));
   let jevCost = 0, jevTokens = 0, fallbacks = 0, drifted = 0, liveDecisions = 0;
   for (const [k, e] of extra) {
     if (!k.startsWith('jev@')) continue;
     jevCost += e.apiCostUsd; jevTokens += e.apiTokens; fallbacks += e.fallbacks ?? 0; drifted += e.drifted; liveDecisions += e.decisions;
   }
   const result = {
-    spec: SPEC, specHash: specHash(), preregistered, ranAt: new Date().toISOString(), seconds: Math.round((performance.now() - t0) / 1000),
+    spec: S, specHash: specHash(S), preregistered, ranAt: new Date().toISOString(), seconds: Math.round((performance.now() - t0) / 1000),
     runs: done.length, reruns: reruns.map((r) => ({ scn: r.scn, seed: r.seed, pair: r.pair })), runnerCalls: calls,
     jev: { decisions: liveDecisions, fallbacks, drifted, tokens: jevTokens, costUsd: jevCost },
     means, primary, exploratory,

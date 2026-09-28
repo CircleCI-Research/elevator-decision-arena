@@ -58,3 +58,19 @@ test('decode aligns probabilities with engine options and rejects bad answers', 
   assert.throws(() => decode(enc, 4, { answers: { decision: { type: 'choice', choice: 'D', probabilities: { A: 1, B: 0, C: 0 } } } }), /not an offered option/);
   assert.throws(() => decode(enc, 4, {}), /malformed/);
 });
+
+test('shuffled encoding: fixed by the request, a permutation of the legal cars, and decoded back to the right car', () => {
+  const plain = encode(3, 'x', obs, options);
+  const a = encode(3, 'x', obs, options, true);
+  const b = encode(3, 'x', obs, options, true);
+  assert.equal(JSON.stringify(a), JSON.stringify(b)); // same request, same order
+  assert.deepEqual([...a.legal].sort(), [...plain.legal].sort()); // same cars offered
+  const crit = (e: any) => e.body.questions.decision.criteria;
+  // Each key describes the car its `legal` entry points to.
+  a.keys.forEach((k, j) => assert.equal(crit(a)[k], crit(plain)[plain.keys[plain.legal.indexOf(a.legal[j])]]));
+  // The model's pick maps back to the car it picked, whatever its letter.
+  a.keys.forEach((k, j) => {
+    const probabilities = Object.fromEntries(a.keys.map((x) => [x, x === k ? 0.9 : 0.1 / (a.keys.length - 1)]));
+    assert.equal(decode(a, options.length, { answers: { decision: { type: 'choice', choice: k, probabilities } } }).choice, a.legal[j]);
+  });
+});

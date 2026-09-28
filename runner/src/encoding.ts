@@ -4,6 +4,7 @@
 // requests, so decisions can be audited and encodings compared (demo set 3).
 // Only facts go in (state-model.md §3). Encoding 2 describes cars relative to
 // the call, computed here, which is part of the contestant, not the engine.
+import { createHash } from 'node:crypto';
 import type { Car, Encoded, Observation, Opt, Req } from './types.ts';
 
 export const QUESTION = 'decision';
@@ -69,9 +70,31 @@ function carEta(c: Car, call: number, vmax: number): string {
   return `arrives in about ${s} s, ${loadWords(c)} (${room} kg of room), ${c.stops ? `${plural(c.stops, 'stop')} planned` : 'no stops planned'}`;
 }
 
-export function encode(encoding: 1 | 2 | 3, model: string, obs: Observation, options: Opt[]): Encoded {
+// Shuffled variants (enc1s, enc3s…): the legal options are listed in an order
+// that looks random but is fixed by the request itself, so the same request
+// always gets the same order. The descriptions carry no car numbers, so the
+// order is the only thing that changes; decode() maps keys back through
+// `legal`, which follows the same order.
+function shuffled<T>(xs: T[], obs: Observation): T[] {
+  const seed = createHash('sha256').update(JSON.stringify({ r: obs.request, t: obs.t, cars: obs.cars })).digest().readUInt32LE(0);
+  let a = seed >>> 0;
+  const rng = () => {
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+  const out = xs.slice();
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+}
+
+export function encode(encoding: 1 | 2 | 3, model: string, obs: Observation, options: Opt[], shuffle = false): Encoded {
   const req: Req = obs.request;
-  const legalOpts = options.filter((o) => o.legal);
+  const legalOpts = shuffle ? shuffled(options.filter((o) => o.legal), obs) : options.filter((o) => o.legal);
   const keys = legalOpts.map((_, k) => KEYS[k]);
   const criteria: Record<string, string> = {};
   let state: unknown;

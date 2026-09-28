@@ -145,6 +145,7 @@ export function fineTuneContestants(backends: Backend[], ids: Record<string, Ide
       },
     });
   }
+  for (const c of [...out]) out.push(shuffledTwin(c, `${c.version}-shuffled`));
   return out;
 }
 
@@ -162,12 +163,22 @@ export interface Live {
   timeoutS: number;
   decisionWh: number;
   expectModel?: string; // what the endpoint must report as the answering model (drift check)
+  shuffle?: boolean; // list the legal options in a fixed, request-seeded shuffled order
   facets: Record<string, { label: string; value?: string }>;
 }
 
 const sha = (s: string) => createHash('sha256').update(s).digest('hex').slice(0, 8);
 const ENC_NAMES = { 1: 'raw numbers', 2: 'semantic', 3: 'derived ETA' } as const;
-const encFacet = (n: 1 | 2 | 3) => ({ label: `system-one-encoding@${n} · ${ENC_NAMES[n]}`, value: sha(TEMPLATES[n]) });
+// The same contestant with its options listed in shuffled order: only the
+// encoding facet differs, so the setup check sees a controlled comparison.
+function shuffledTwin(c: Live, version: string): Live {
+  return { ...c, version, cid: `${c.id}@${version}`, shuffle: true, description: `${c.description} Options are listed in a shuffled order.`, facets: { ...c.facets, encoding: encFacet(c.encoding, true) } };
+}
+
+const encFacet = (n: 1 | 2 | 3, shuffle = false) =>
+  shuffle
+    ? { label: `system-one-encoding@${n}s · ${ENC_NAMES[n]}, options in shuffled order`, value: sha(`${TEMPLATES[n]} · options shuffled`) }
+    : { label: `system-one-encoding@${n} · ${ENC_NAMES[n]}`, value: sha(TEMPLATES[n]) };
 
 export function liveContestants(): Live[] {
   const out: Live[] = [];
@@ -217,6 +228,7 @@ export function liveContestants(): Live[] {
       },
     });
   }
+  for (const c of out.filter((x) => x.id === 'jev' && (x.encoding === 1 || x.encoding === 3))) out.push(shuffledTwin(c, `${c.version}s`));
   return out;
 }
 
@@ -245,7 +257,7 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export async function decide(c: Live, body: DecideBody): Promise<DecideResult> {
   const b = c.backend;
-  const enc = encode(c.encoding, b.model, body.observation, body.options);
+  const enc = encode(c.encoding, b.model, body.observation, body.options, c.shuffle ?? false);
   const q0 = performance.now();
   await acquire(b);
   const queuedMs = performance.now() - q0;
