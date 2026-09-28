@@ -234,7 +234,9 @@ def main():
             if nb % 50 == 0:
                 done = (bi + a.micro_batch) / len(train)
                 rate = (bi + a.micro_batch) / (time.time() - te)
-                log(f"  epoch {epoch + 1}/{a.epochs} · {done * 100:.0f}% · loss {tot / nb:.4f} · reward {r.mean().item():.3f} · {rate:.1f} items/s · memory {mem_gb(device):.1f} GB")
+                left = (len(train) - bi - a.micro_batch) / max(rate, 1e-6) + (a.epochs - epoch - 1) * len(train) / max(rate, 1e-6)
+                eta = time.strftime("%H:%M", time.localtime(time.time() + left + 50 * (a.epochs - epoch)))  # + ~50 s per remaining validation pass
+                log(f"  epoch {epoch + 1}/{a.epochs} · {done * 100:.0f}% · loss {tot / nb:.4f} · reward {r.mean().item():.3f} · {rate:.1f} items/s · memory {mem_gb(device):.1f} GB · ETA ~{eta}")
             if a.max_steps and step >= a.max_steps:
                 break
         acc, _ = evaluate(model, val, tok.pad_token_id, device, a.bf16)
